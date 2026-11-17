@@ -3,6 +3,9 @@ name: Sync to Gitee
 on:
   release:
     types: [published]
+  schedule:
+    # 兜底轮询：即使 GitHub 的 release 事件没有触发，也能在 15 分钟内补同步。
+    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       tag:
@@ -18,7 +21,68 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.precheck.outputs.skip }}
+      tag: ${{ steps.precheck.outputs.tag }}
+    env:
+      GITEE_OWNER: meiliwang0808
+      GITEE_REPO: novae-releases
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+    steps:
+      - name: Check whether this release is already fully synced
+        id: precheck
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG="$(gh release view --json tagName -q .tagName)"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          VERSION="${TAG#v}"
+
+          API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
+          REL_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/tags/${TAG}?access_token=${GITEE_TOKEN}" || true)"
+          if [ -z "$REL_JSON" ] || [ "$REL_JSON" = "null" ]; then
+            echo "Gitee release missing; sync needed"
+            exit 0
+          fi
+          REL_ID="$(printf '%s' "$REL_JSON" | jq -r '.id // empty')"
+          if [ -z "$REL_ID" ] || [ "$REL_ID" = "null" ]; then
+            echo "Gitee release id missing; sync needed"
+            exit 0
+          fi
+
+          MANIFEST="$(curl -fsS "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/latest-gitee.json" || true)"
+          MANIFEST_VERSION="$(printf '%s' "$MANIFEST" | jq -r '.version // empty' 2>/dev/null || true)"
+          if [ "$MANIFEST_VERSION" != "$VERSION" ]; then
+            echo "Manifest is not $VERSION; sync needed"
+            exit 0
+          fi
+
+          SZ="$(gh release view "$TAG" --json assets -q '.assets[] | select(.name == "novae.exe") | .size' | head -1)"
+          if [ -z "$SZ" ]; then
+            echo "GitHub release has no novae.exe; sync needed"
+            exit 0
+          fi
+          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || true)"
+          if printf '%s' "$ATT_JSON" | jq -e --argjson size "$SZ" '.[] | select(.name == "novae.exe" and .size == $size)' >/dev/null 2>&1; then
+            echo "Gitee already has $TAG novae.exe (${SZ} bytes); skip"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Gitee asset missing or size mismatch; sync needed"
+          fi
+
   sync:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     env:
       GITEE_OWNER: meiliwang0808
@@ -37,7 +101,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG="${{ github.event.release.tag_name || inputs.tag }}"
+          TAG="${{ needs.check.outputs.tag }}"
           if [ -z "$TAG" ]; then
             TAG="$(gh release view --json tagName -q .tagName)"
           fi
@@ -124,6 +188,7 @@ jobs:
 
       - name: Create or update Gitee release
         id: gitee_release
+        continue-on-error: true
         run: |
           set -euo pipefail
           API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
@@ -148,22 +213,24 @@ jobs:
             curl --http1.1 --connect-timeout 20 --max-time 120 -fsS -X DELETE "${API}/releases/${REL_ID}/attach_files/${ATT_ID}?access_token=${GITEE_TOKEN}" >/dev/null || true
           done
 
-          # 附件 51MB，GitHub Runner 到 Gitee 的国际链路较慢；强制 HTTP/1.1，
-          # 避免 HTTP/2 大文件上传被流控挂住，并给上传设置硬超时与重试。
-          curl --http1.1 --connect-timeout 20 --max-time 900 --retry 3 --retry-delay 5 -fsS -X POST \
+          # 附件 51MB。GitHub Runner 到 Gitee 的国际链路实测可能 0 字节超时；
+          # 这里只做一次短尝试，失败不阻塞代码/标签/Release/清单同步。
+          # 本机 Novae Gitee 同步任务会在 5 分钟内补传 exe。
+          curl --http1.1 --connect-timeout 20 --max-time 180 --retry 1 --retry-delay 5 -fsS -X POST \
             -F "file=@dist/${{ steps.release.outputs.asset }}" \
             "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" \
             > gitee-attachment.json
 
       - name: Verify Gitee release asset
+        continue-on-error: true
         run: |
           set -euo pipefail
           API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
           REL_ID="${{ steps.gitee_release.outputs.release_id }}"
-          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
+          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
           URL="$(printf '%s' "$ATT_JSON" | jq -r '.[0].browser_download_url // empty')"
           if [ -z "$URL" ]; then
-            echo "Gitee attachment URL missing" >&2
-            exit 1
+            echo "::warning::Gitee 附件尚未上传；本机同步任务会在 5 分钟内补传。"
+            exit 0
           fi
           echo "Gitee asset: $URL"
