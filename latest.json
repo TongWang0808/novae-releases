@@ -1,12 +1,12 @@
 {
-  "version": "1.2.1",
-  "publishedAt": "2026-11-17T04:23:53Z",
-  "notes": "新增检查更新、下载更新与更新助手；关于页可查看更新状态。",
+  "version": "1.2.2",
+  "publishedAt": "2026-11-17T09:00:44Z",
+  "notes": "新增 GitHub / Gitee 更新源切换；GitHub 访问受限时可切换到 Gitee 检查更新。\r\n修复设置按钮红点被遮挡的问题。\r\n\r\n更新源可在「设置 → 关于」中切换，切换后会重新检查最新版本。",
   "assets": {
     "windows-amd64": {
-      "url": "https://github.com/TongWang0808/novae-releases/releases/download/v1.2.1/novae.exe",
-      "sha256": "8baa84e3f100f621ccbf02b806aaf1ab17bd288caa595ec3f37a55f30ac9e544",
-      "size": 51333632
+      "url": "https://github.com/TongWang0808/novae-releases/releases/download/v1.2.2/novae.exe",
+      "sha256": "8e0f1f3d9d3d91b0099116af374a57b399a64368fc15547c9ae09ba47a06813c",
+      "size": 51340288
     }
   }
 }
