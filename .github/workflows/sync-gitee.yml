@@ -230,19 +230,8 @@ jobs:
           fi
           echo "release_id=$REL_ID" >> "$GITHUB_OUTPUT"
 
-          # 重跑时删除旧附件，避免同一 Release 出现重复 exe。
-          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || echo '[]')"
-          for ATT_ID in $(printf '%s' "$ATT_JSON" | jq -r '.[].id // empty'); do
-            curl --http1.1 --connect-timeout 20 --max-time 120 -fsS -X DELETE "${API}/releases/${REL_ID}/attach_files/${ATT_ID}?access_token=${GITEE_TOKEN}" >/dev/null || true
-          done
-
-          # 附件 51MB。GitHub Runner 到 Gitee 的国际链路实测可能 0 字节超时；
-          # 这里只做一次短尝试，失败不阻塞代码/标签/Release/清单同步。
-          # 本机 Novae Gitee 同步任务会在 5 分钟内补传 exe。
-          curl --http1.1 --connect-timeout 20 --max-time 180 --retry 1 --retry-delay 5 -fsS -X POST \
-            -F "file=@dist/${{ steps.release.outputs.asset }}" \
-            "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" \
-            > gitee-attachment.json
+          # 51MB exe 由本机 Novae Gitee 同步任务上传，GitHub Runner 不再执行跨国大文件上传。
+          # 这样可避免 curl (28) 180 秒超时，也避免 Actions 删除本机刚上传的附件。
 
       - name: Verify Gitee release asset
         continue-on-error: true
