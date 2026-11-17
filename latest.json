@@ -1,0 +1,12 @@
+{
+  "version": "1.2.0",
+  "publishedAt": "2026-11-17T12:05:10+08:00",
+  "notes": "首个更新基线版本。",
+  "assets": {
+    "windows-amd64": {
+      "url": "https://github.com/TongWang0808/novae-releases/releases/download/v1.2.0/novae.exe",
+      "sha256": "d9c025c627718e7fbc963bd756aa8e849547a6a8c8e82b412243924e1d1735b4",
+      "size": 51278336
+    }
+  }
+}
