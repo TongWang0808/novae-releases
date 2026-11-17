@@ -68,11 +68,33 @@ jobs:
           GH_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${ASSET}"
           GITEE_URL="https://gitee.com/${GITEE_OWNER}/${GITEE_REPO}/releases/download/${TAG}/${ASSET}"
 
-          jq -n             --arg version "$VERSION"             --arg publishedAt "$PUBLISHED"             --arg notes "$NOTES"             --arg url "$GH_URL"             --arg sha256 "$SHA"             --argjson size "$SIZE"             '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}'             > latest.json
+          jq -n \
+            --arg version "$VERSION" \
+            --arg publishedAt "$PUBLISHED" \
+            --arg notes "$NOTES" \
+            --arg url "$GH_URL" \
+            --arg sha256 "$SHA" \
+            --argjson size "$SIZE" \
+            '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}' \
+            > latest.json
 
-          jq -n             --arg version "$VERSION"             --arg publishedAt "$PUBLISHED"             --arg notes "$NOTES"             --arg url "$GITEE_URL"             --arg sha256 "$SHA"             --argjson size "$SIZE"             '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}'             > latest-gitee.json
+          jq -n \
+            --arg version "$VERSION" \
+            --arg publishedAt "$PUBLISHED" \
+            --arg notes "$NOTES" \
+            --arg url "$GITEE_URL" \
+            --arg sha256 "$SHA" \
+            --argjson size "$SIZE" \
+            '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}' \
+            > latest-gitee.json
 
-          jq -n             --arg tag "$TAG"             --arg name "Novae ${VERSION}"             --arg body "$NOTES"             --arg target "main"             '{tag_name:$tag,name:$name,body:$body,target_commitish:$target,prerelease:false}'             > gitee-release.json
+          jq -n \
+            --arg tag "$TAG" \
+            --arg name "Novae ${VERSION}" \
+            --arg body "$NOTES" \
+            --arg target "main" \
+            '{tag_name:$tag,name:$name,body:$body,target_commitish:$target,prerelease:false}' \
+            > gitee-release.json
 
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -106,9 +128,12 @@ jobs:
           set -euo pipefail
           API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
           TAG="${{ steps.release.outputs.tag }}"
-          REL_JSON="$(curl -fsS "${API}/releases/tags/${TAG}?access_token=${GITEE_TOKEN}" || true)"
+          REL_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS "${API}/releases/tags/${TAG}?access_token=${GITEE_TOKEN}" || true)"
           if [ -z "$REL_JSON" ]; then
-            REL_JSON="$(curl -fsS -X POST               -H 'Content-Type: application/json'               --data-binary @gitee-release.json               "${API}/releases?access_token=${GITEE_TOKEN}")"
+            REL_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS -X POST \
+              -H 'Content-Type: application/json' \
+              --data-binary @gitee-release.json \
+              "${API}/releases?access_token=${GITEE_TOKEN}")"
           fi
           REL_ID="$(printf '%s' "$REL_JSON" | jq -r '.id')"
           if [ -z "$REL_ID" ] || [ "$REL_ID" = "null" ]; then
@@ -118,19 +143,24 @@ jobs:
           echo "release_id=$REL_ID" >> "$GITHUB_OUTPUT"
 
           # 重跑时删除旧附件，避免同一 Release 出现重复 exe。
-          ATT_JSON="$(curl -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || echo '[]')"
+          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || echo '[]')"
           for ATT_ID in $(printf '%s' "$ATT_JSON" | jq -r '.[].id // empty'); do
-            curl -fsS -X DELETE "${API}/releases/${REL_ID}/attach_files/${ATT_ID}?access_token=${GITEE_TOKEN}" >/dev/null || true
+            curl --http1.1 --connect-timeout 20 --max-time 120 -fsS -X DELETE "${API}/releases/${REL_ID}/attach_files/${ATT_ID}?access_token=${GITEE_TOKEN}" >/dev/null || true
           done
 
-          curl -fsS -X POST             -F "file=@dist/${{ steps.release.outputs.asset }}"             "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}"             > gitee-attachment.json
+          # 附件 51MB，GitHub Runner 到 Gitee 的国际链路较慢；强制 HTTP/1.1，
+          # 避免 HTTP/2 大文件上传被流控挂住，并给上传设置硬超时与重试。
+          curl --http1.1 --connect-timeout 20 --max-time 900 --retry 3 --retry-delay 5 -fsS -X POST \
+            -F "file=@dist/${{ steps.release.outputs.asset }}" \
+            "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" \
+            > gitee-attachment.json
 
       - name: Verify Gitee release asset
         run: |
           set -euo pipefail
           API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
           REL_ID="${{ steps.gitee_release.outputs.release_id }}"
-          ATT_JSON="$(curl -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
+          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 120 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
           URL="$(printf '%s' "$ATT_JSON" | jq -r '.[0].browser_download_url // empty')"
           if [ -z "$URL" ]; then
             echo "Gitee attachment URL missing" >&2
