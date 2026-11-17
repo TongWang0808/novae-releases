@@ -94,13 +94,10 @@ jobs:
             echo "GitHub release has no novae.exe; sync needed"
             exit 0
           fi
-          ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || true)"
-          if printf '%s' "$ATT_JSON" | jq -e --argjson size "$SZ" '.[] | select(.name == "novae.exe" and .size == $size)' >/dev/null 2>&1; then
-            echo "Gitee already has $TAG novae.exe (${SZ} bytes); skip"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Gitee asset missing or size mismatch; sync needed"
-          fi
+          # 大文件 exe 由本机 Novae 同步任务上传；Gitee 附件缺失或大小不符时，
+          # 不再从 GitHub Runner 触发上传，也不让定时任务每 15 分钟重复跑。
+          echo "Gitee release and manifest are current; local task owns asset upload"
+          echo "skip=true" >> "$GITHUB_OUTPUT"
 
   sync:
     needs: check
