@@ -3,6 +3,9 @@ name: Sync to Gitee
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - "v*"        # Release 页面新建 tag 时也会触发；用于兜底 release 事件
   schedule:
     # 兜底轮询：即使 GitHub 的 release 事件没有触发，也能在 15 分钟内补同步。
     - cron: "*/15 * * * *"
@@ -42,12 +45,30 @@ jobs:
             TAG="${{ github.event.inputs.tag }}"
           elif [ "${{ github.event_name }}" = "release" ]; then
             TAG="${{ github.event.release.tag_name }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            TAG="${{ github.ref_name }}"
           else
             TAG="$(gh release view --json tagName -q .tagName)"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
           VERSION="${TAG#v}"
+
+          # tag push 可能早于 Release 发布：最多等 60 秒，避免空跑。
+          FOUND=false
+          for i in $(seq 1 12); do
+            if gh release view "$TAG" --json tagName -q .tagName >/dev/null 2>&1; then
+              FOUND=true
+              break
+            fi
+            echo "Release $TAG is not visible yet; waiting 5s ($i/12)"
+            sleep 5
+          done
+          if [ "$FOUND" != "true" ]; then
+            echo "Release $TAG is not published yet; skip this run"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
           REL_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/tags/${TAG}?access_token=${GITEE_TOKEN}" || true)"
