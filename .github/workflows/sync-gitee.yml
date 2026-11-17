@@ -30,6 +30,7 @@ jobs:
       GITEE_OWNER: meiliwang0808
       GITEE_REPO: novae-releases
       GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Check whether this release is already fully synced
         id: precheck
@@ -88,6 +89,7 @@ jobs:
       GITEE_OWNER: meiliwang0808
       GITEE_REPO: novae-releases
       GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
