@@ -1,0 +1,139 @@
+name: Sync to Gitee
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, e.g. v1.2.2. Leave empty to use the latest release."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-to-gitee
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GITEE_OWNER: meiliwang0808
+      GITEE_REPO: novae-releases
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve release and generate manifests
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.event.release.tag_name || inputs.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="$(gh release view --json tagName -q .tagName)"
+          fi
+          VERSION="${TAG#v}"
+          gh release view "$TAG" --json tagName,name,body,publishedAt,assets > release.json
+
+          ASSET="$(jq -r '.assets[] | select(.name == "novae.exe") | .name' release.json | head -1)"
+          if [ -z "$ASSET" ]; then
+            ASSET="$(jq -r '.assets[] | select(.name | endswith(".exe")) | .name' release.json | head -1)"
+          fi
+          if [ -z "$ASSET" ]; then
+            echo "Release $TAG has no .exe asset" >&2
+            exit 1
+          fi
+
+          mkdir -p dist
+          gh release download "$TAG" --pattern "$ASSET" --dir dist --clobber
+          if [ ! -f "dist/$ASSET" ]; then
+            echo "Downloaded asset not found: dist/$ASSET" >&2
+            exit 1
+          fi
+
+          SIZE="$(stat -c%s "dist/$ASSET")"
+          SHA="$(sha256sum "dist/$ASSET" | awk '{print $1}')"
+          NOTES="$(jq -r '.body // ""' release.json)"
+          PUBLISHED="$(jq -r '.publishedAt // ""' release.json)"
+
+          GH_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${ASSET}"
+          GITEE_URL="https://gitee.com/${GITEE_OWNER}/${GITEE_REPO}/releases/download/${TAG}/${ASSET}"
+
+          jq -n             --arg version "$VERSION"             --arg publishedAt "$PUBLISHED"             --arg notes "$NOTES"             --arg url "$GH_URL"             --arg sha256 "$SHA"             --argjson size "$SIZE"             '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}'             > latest.json
+
+          jq -n             --arg version "$VERSION"             --arg publishedAt "$PUBLISHED"             --arg notes "$NOTES"             --arg url "$GITEE_URL"             --arg sha256 "$SHA"             --argjson size "$SIZE"             '{version:$version,publishedAt:$publishedAt,notes:$notes,assets:{"windows-amd64":{url:$url,sha256:$sha256,size:$size}}}'             > latest-gitee.json
+
+          jq -n             --arg tag "$TAG"             --arg name "Novae ${VERSION}"             --arg body "$NOTES"             --arg target "main"             '{tag_name:$tag,name:$name,body:$body,target_commitish:$target,prerelease:false}'             > gitee-release.json
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "asset=$ASSET" >> "$GITHUB_OUTPUT"
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Commit manifests to GitHub main
+        run: |
+          set -euo pipefail
+          git config user.name "novae-release-bot"
+          git config user.email "noreply@users.noreply.github.com"
+          git add latest.json latest-gitee.json
+          if git diff --cached --quiet; then
+            echo "Manifests already up to date"
+          else
+            git commit -m "chore: publish ${{ steps.release.outputs.tag }} manifests"
+            git push origin HEAD:main
+          fi
+
+      - name: Mirror repository to Gitee
+        run: |
+          set -euo pipefail
+          git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git"
+          git push --force gitee HEAD:main
+          git push --force --tags gitee
+
+      - name: Create or update Gitee release
+        id: gitee_release
+        run: |
+          set -euo pipefail
+          API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
+          TAG="${{ steps.release.outputs.tag }}"
+          REL_JSON="$(curl -fsS "${API}/releases/tags/${TAG}?access_token=${GITEE_TOKEN}" || true)"
+          if [ -z "$REL_JSON" ]; then
+            REL_JSON="$(curl -fsS -X POST               -H 'Content-Type: application/json'               --data-binary @gitee-release.json               "${API}/releases?access_token=${GITEE_TOKEN}")"
+          fi
+          REL_ID="$(printf '%s' "$REL_JSON" | jq -r '.id')"
+          if [ -z "$REL_ID" ] || [ "$REL_ID" = "null" ]; then
+            echo "Could not resolve Gitee release id" >&2
+            exit 1
+          fi
+          echo "release_id=$REL_ID" >> "$GITHUB_OUTPUT"
+
+          # 重跑时删除旧附件，避免同一 Release 出现重复 exe。
+          ATT_JSON="$(curl -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}" || echo '[]')"
+          for ATT_ID in $(printf '%s' "$ATT_JSON" | jq -r '.[].id // empty'); do
+            curl -fsS -X DELETE "${API}/releases/${REL_ID}/attach_files/${ATT_ID}?access_token=${GITEE_TOKEN}" >/dev/null || true
+          done
+
+          curl -fsS -X POST             -F "file=@dist/${{ steps.release.outputs.asset }}"             "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}"             > gitee-attachment.json
+
+      - name: Verify Gitee release asset
+        run: |
+          set -euo pipefail
+          API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}"
+          REL_ID="${{ steps.gitee_release.outputs.release_id }}"
+          ATT_JSON="$(curl -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
+          URL="$(printf '%s' "$ATT_JSON" | jq -r '.[0].browser_download_url // empty')"
+          if [ -z "$URL" ]; then
+            echo "Gitee attachment URL missing" >&2
+            exit 1
+          fi
+          echo "Gitee asset: $URL"
