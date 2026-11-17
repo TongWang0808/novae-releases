@@ -5,8 +5,8 @@
   "assets": {
     "windows-amd64": {
       "url": "https://github.com/TongWang0808/novae-releases/releases/download/v1.2.1/novae.exe",
-      "sha256": "089454c0ee0543ba8131a805cf68654807cb8dded41ee9a2931b02da9416da2f",
-      "size": 51325952
+      "sha256": "8f8eb08117aad6e16347233591869640c46a8df8b24f60d14ef04bb4c910c88e",
+      "size": 51329536
     }
   }
 }
