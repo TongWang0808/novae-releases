@@ -1,0 +1,67 @@
+name: Sync README to Gitee
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - README.md
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-readme-to-gitee
+  cancel-in-progress: false
+
+jobs:
+  sync-readme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITEE_OWNER: meiliwang0808
+      GITEE_REPO: novae-releases
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+    steps:
+      - name: Mirror README.md to Gitee
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/README.md"
+          RAW="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/README.md"
+
+          curl --http1.1 --retry 3 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 60 -fsSL "$RAW" -o gh-readme.md
+          base64 -w0 gh-readme.md > gh-readme.b64
+
+          curl --http1.1 --retry 3 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 60 -fsSL \
+            "${API}?access_token=${GITEE_TOKEN}" -o gitee-readme.json
+
+          CUR_SHA="$(jq -r '.sha // empty' gitee-readme.json)"
+          jq -r '.content // empty' gitee-readme.json | tr -d '\n\r ' > gitee-readme.b64
+
+          if [ -n "$CUR_SHA" ] && cmp -s gh-readme.b64 gitee-readme.b64; then
+            echo "README already in sync"
+            exit 0
+          fi
+
+          if [ -n "$CUR_SHA" ]; then
+            jq -n --arg message "docs: sync README from GitHub" \
+              --rawfile content gh-readme.b64 --arg sha "$CUR_SHA" --arg branch main \
+              '{message:$message,content:$content,sha:$sha,branch:$branch}' > payload.json
+          else
+            jq -n --arg message "docs: sync README from GitHub" \
+              --rawfile content gh-readme.b64 --arg branch main \
+              '{message:$message,content:$content,branch:$branch}' > payload.json
+          fi
+
+          curl --http1.1 --retry 3 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 60 -fsSL -X PUT \
+            -H 'Content-Type: application/json' --data-binary @payload.json \
+            "${API}?access_token=${GITEE_TOKEN}" -o result.json
+
+          echo "Gitee README commit: $(jq -r '.commit.sha // "unknown"' result.json)"
