@@ -65,18 +65,7 @@ jobs:
           TOTAL=$((GH_COUNT + GITEE_COUNT))
           UPDATED="$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
 
-          jq -n \
-            --argjson github "$GH_COUNT" \
-            --argjson gitee "$GITEE_COUNT" \
-            --argjson total "$TOTAL" \
-            --argjson partial "$PARTIAL" \
-            --arg updatedAt "$UPDATED" \
-            --arg githubError "$GH_ERROR" \
-            --arg giteeError "$GITEE_ERROR" \
-            '{snapshot:1,updatedAt:$updatedAt,github:$github,gitee:$gitee,total:$total,githubWindow:"近 14 天",giteeWindow:"近 7 天",partial:$partial,giteeAvailable:($giteeError == ""),note:"GitHub / Gitee 项目页访问次数（含仓库下各页面）"} \
-            + (if $githubError != "" then {githubError:$githubError} else {} end) \
-            + (if $giteeError != "" then {giteeError:$giteeError} else {} end)' \
-            > stats/visits.json
+          jq -n --argjson github "$GH_COUNT" --argjson gitee "$GITEE_COUNT" --argjson total "$TOTAL" --argjson partial "$PARTIAL" --arg updatedAt "$UPDATED" --arg githubError "$GH_ERROR" --arg giteeError "$GITEE_ERROR" '{snapshot:1,updatedAt:$updatedAt,github:$github,gitee:$gitee,total:$total,githubWindow:"近 14 天",giteeWindow:"近 7 天",partial:$partial,giteeAvailable:($giteeError == ""),note:"GitHub / Gitee 项目页访问次数（含仓库下各页面）"} + (if $githubError != "" then {githubError:$githubError} else {} end) + (if $giteeError != "" then {giteeError:$giteeError} else {} end)' > stats/visits.json
 
           cat stats/visits.json
 
