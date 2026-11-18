@@ -3,7 +3,7 @@ name: Publish visit stats
 on:
   schedule:
     # GitHub / Gitee 的访问数据按小时/天聚合，15 分钟足够保持累计账本最新。
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 
 permissions:
