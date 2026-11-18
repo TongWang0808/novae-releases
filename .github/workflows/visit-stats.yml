@@ -56,6 +56,11 @@ jobs:
             printf '{}' > /tmp/novae-gitee-traffic.json
           fi
 
+          # Abacus 的使用人数 counter 是公共免账号计数器；每 15 分钟读一次，
+          # 既保持它在 6 个月 TTL 内不失效，也不增加计数。
+          curl --http1.1 --connect-timeout 15 --max-time 30 -sS \
+            "https://abacus.jasoncameron.dev/get/novae-releases/installs" >/dev/null || true
+
           export GH_TRAFFIC_JSON=/tmp/novae-gh-traffic.json
           export GITEE_TRAFFIC_JSON=/tmp/novae-gitee-traffic.json
           python3 tools/update_visit_ledger.py
