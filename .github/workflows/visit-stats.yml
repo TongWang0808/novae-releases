@@ -1,18 +1,14 @@
 name: Publish visit stats
-
 on:
   schedule:
-    # GitHub / Gitee 的访问数据按小时/天聚合，15 分钟足够保持累计账本最新。
+    # GitHub / Gitee 的访问数据按小时/天聚合，5 分钟刷新累计账本。
     - cron: "*/5 * * * *"
   workflow_dispatch:
-
 permissions:
   contents: write
-
 concurrency:
   group: publish-visit-stats
   cancel-in-progress: false
-
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -28,13 +24,11 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-
       - name: Fetch GitHub and Gitee project page views
         run: |
           set -euo pipefail
           mkdir -p stats
           rm -f /tmp/novae-gh-traffic.json /tmp/novae-gitee-traffic.json
-
           # 不使用 jq：解析交给 Python，避免多行表达式在 runner 上被拆坏。
           curl --http1.1 --connect-timeout 20 --max-time 60 -sS \
             -H "Accept: application/vnd.github+json" \
@@ -42,30 +36,26 @@ jobs:
             -H "Authorization: Bearer ${GH_TRAFFIC_TOKEN}" \
             -o /tmp/novae-gh-traffic.json \
             "https://api.github.com/repos/${GH_REPO}/traffic/views" || true
-
           curl --http1.1 --connect-timeout 20 --max-time 60 -sS \
             -X POST \
             -H "Authorization: token ${GITEE_TOKEN}" \
             -o /tmp/novae-gitee-traffic.json \
             "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/traffic-data" || true
-
           if [ ! -s /tmp/novae-gh-traffic.json ]; then
             printf '{}' > /tmp/novae-gh-traffic.json
           fi
           if [ ! -s /tmp/novae-gitee-traffic.json ]; then
             printf '{}' > /tmp/novae-gitee-traffic.json
           fi
-
-          # Abacus 的使用人数 counter 是公共免账号计数器；每 15 分钟读一次，
+          # Abacus 的使用人数 counter 是公共免账号计数器；每 5 分钟读一次，
           # 既保持它在 6 个月 TTL 内不失效，也不增加计数。
           curl --http1.1 --connect-timeout 15 --max-time 30 -sS \
             "https://abacus.jasoncameron.dev/get/novae-releases/installs" >/dev/null || true
-
           export GH_TRAFFIC_JSON=/tmp/novae-gh-traffic.json
           export GITEE_TRAFFIC_JSON=/tmp/novae-gitee-traffic.json
           python3 tools/update_visit_ledger.py
-
       - name: Commit to GitHub main
+        id: commit
         run: |
           set -euo pipefail
           git config user.name "novae-visit-bot"
@@ -73,12 +63,14 @@ jobs:
           git add stats/visits.json stats/traffic-ledger.json
           if git diff --cached --quiet; then
             echo "Visit stats unchanged"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: update lifetime visit stats"
             git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Mirror stats to Gitee
+        if: steps.commit.outputs.changed == 'true'
         run: |
           set -euo pipefail
           mirror_file() {
