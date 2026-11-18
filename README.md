@@ -6,7 +6,7 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 **1.3.0 正式版** · Windows 10 / 11 x64
 
-[GitHub 下载](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 下载](https://gitee.com/meiliwang0808/novae-releases/releases/latest) · [Gitee 仓库](https://gitee.com/meiliwang0808/novae-releases)
+[GitHub 下载](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 下载](https://gitee.com/meiliwang0808/novae-releases/releases/latest)
 
 ---
 
@@ -25,31 +25,31 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 界面预览
 
-截图中的账号昵称、头像和个人信息均已打码。
+以下截图直接来自 Novae 实际界面。
 
-| 首页 / 登录入口 | 搜索：歌手与专辑 |
+| 沉浸播放页面 | 沉浸光感与按压形变 |
 | --- | --- |
-| ![首页](docs/readme-1.3.0/01-home.png) | ![搜索](docs/readme-1.3.0/02-search.png) |
+| ![沉浸播放页面](docs/readme-1.3.0/01-immersive-player.png) | ![沉浸光感与按压形变](docs/readme-1.3.0/02-immersive-press.png) |
 
-| 我喜欢的音乐 | 下载音乐 |
+| 多种外观选择 | 歌手大卡片 |
 | --- | --- |
-| ![我喜欢的音乐](docs/readme-1.3.0/03-favorites-masked.png) | ![下载音乐](docs/readme-1.3.0/04-downloads.png) |
+| ![多种外观选择](docs/readme-1.3.0/03-themes.png) | ![歌手大卡片](docs/readme-1.3.0/04-artist-card.png) |
 
-| 歌手页：专辑 | 歌手页：歌曲 |
+| 歌手卡片吸顶和歌曲展示 | 歌手专辑 |
 | --- | --- |
-| ![歌手页专辑](docs/readme-1.3.0/05-artist-albums.png) | ![歌手页歌曲](docs/readme-1.3.0/06-artist-songs.png) |
+| ![歌手卡片吸顶和歌曲展示](docs/readme-1.3.0/05-artist-songs.png) | ![歌手专辑](docs/readme-1.3.0/06-artist-albums.png) |
 
-| 歌手页：简介展开 | 沉浸播放器 / 歌词页 |
+| 加入群聊反馈 | 联想搜索与历史记录 |
 | --- | --- |
-| ![歌手页简介](docs/readme-1.3.0/07-artist-bio.png) | ![沉浸播放器](docs/readme-1.3.0/08-immersive-player.png) |
+| ![加入群聊反馈](docs/readme-1.3.0/07-qq-group.png) | ![联想搜索与历史记录](docs/readme-1.3.0/08-search-suggest.png) |
 
-| 设置页：账号 | 最近播放 |
+| 平台歌单 | 平台账户卡片 |
 | --- | --- |
-| ![设置页账号](docs/readme-1.3.0/09-settings-account.png) | ![最近播放](docs/readme-1.3.0/10-recent-play.png) |
+| ![平台歌单](docs/readme-1.3.0/09-platform-playlists.png) | ![平台账户卡片](docs/readme-1.3.0/10-platform-accounts.png) |
 
-| 搜索联想 | 账号详情 |
+| 账号管理页面 | 我喜欢的音乐 |
 | --- | --- |
-| ![搜索联想](docs/readme-1.3.0/11-search-suggest.png) | ![账号详情](docs/readme-1.3.0/12-account-detail.png) |
+| ![账号管理页面](docs/readme-1.3.0/11-account-manage.png) | ![我喜欢的音乐](docs/readme-1.3.0/12-likes.png) |
 
 ---
 
@@ -105,6 +105,7 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 - 版本号位置提供检查更新入口，启动后也会自动检查。
 - 新版本显示红点、版本号、更新说明和下载入口，不强制更新、不自动下载。
 - 更新源支持 GitHub / Gitee 切换；GitHub 不稳定时可以改用 Gitee 检查和下载。
+- 设置页「关于」新增下载统计：进入页面自动刷新，也可手动刷新，汇总所有版本的安装包下载次数。
 
 ---
 
@@ -123,7 +124,6 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 - 不保存平台账号密码，不模拟登录接口；Cookie 只保存在本机，并用 Windows DPAPI 加密。
 - 所有平台的 Cookie、昵称、头像与会员信息在 `%APPDATA%\Novae\accounts.json`；华为登录凭据单独加密。
-- 截图中的账号昵称、头像和个人信息均已打码；README 不展示真实账号资料。
 - 下载目录、播放记录和缓存都在本机；启用歌词翻译时，歌词文本会发送给第三方翻译服务（不含 Cookie）。
 - 本项目不内置任何音源、账号或会员凭据；云端 / 本机 API 由使用者自行部署并承担相应责任。
 
@@ -145,6 +145,7 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 界面组织与交互细节参考过：
 
+- [沐语](https://wutuapp.com/)
 - [听澜 · Tinglan](https://github.com/talongao/tinglan)
 - [Melotopia](https://melotopia.chenlvin.cc/)
 
