@@ -1,12 +1,13 @@
 {
-  "snapshot": 1,
-  "updatedAt": "2026-11-18 16:35:20",
+  "snapshot": 2,
+  "updatedAt": "2026-11-18 16:41:35",
   "github": 194,
   "gitee": 14,
   "total": 208,
-  "githubWindow": "近 14 天",
-  "giteeWindow": "近 7 天",
+  "trackingStartedAt": "2026-11-17",
+  "githubWindow": "自 2026-11-17 累计",
+  "giteeWindow": "自 2026-11-17 累计",
   "partial": false,
   "giteeAvailable": true,
-  "note": "GitHub / Gitee 项目页访问次数（含仓库下各页面）"
+  "note": "GitHub / Gitee 项目页累计访问（含仓库下各页面）"
 }
