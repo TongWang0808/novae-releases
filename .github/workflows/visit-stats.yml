@@ -2,7 +2,7 @@ name: Publish visit stats
 
 on:
   schedule:
-    # GitHub / Gitee 的访问数据本身就是按小时/天聚合，15 分钟足够保持可用。
+    # GitHub / Gitee 的访问数据按小时/天聚合，15 分钟足够保持累计账本最新。
     - cron: "*/15 * * * *"
   workflow_dispatch:
 
@@ -33,72 +33,73 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p stats
+          rm -f /tmp/novae-gh-traffic.json /tmp/novae-gitee-traffic.json
 
-          GH_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS \
+          # 不使用 jq：解析交给 Python，避免多行表达式在 runner 上被拆坏。
+          curl --http1.1 --connect-timeout 20 --max-time 60 -sS \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Authorization: Bearer ${GH_TRAFFIC_TOKEN}" \
-            "https://api.github.com/repos/${GH_REPO}/traffic/views" || true)"
-          if [ -z "$GH_JSON" ]; then
-            GH_JSON='{}'
-          fi
-          GH_COUNT="$(printf '%s' "$GH_JSON" | jq -r '.count // 0' 2>/dev/null || echo 0)"
-          GH_ERROR="$(printf '%s' "$GH_JSON" | jq -r '.message // empty' 2>/dev/null || true)"
+            -o /tmp/novae-gh-traffic.json \
+            "https://api.github.com/repos/${GH_REPO}/traffic/views" || true
 
-          GITEE_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS \
+          curl --http1.1 --connect-timeout 20 --max-time 60 -sS \
             -X POST \
             -H "Authorization: token ${GITEE_TOKEN}" \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/traffic-data" || true)"
-          if [ -z "$GITEE_JSON" ]; then
-            GITEE_JSON='{}'
+            -o /tmp/novae-gitee-traffic.json \
+            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/traffic-data" || true
+
+          if [ ! -s /tmp/novae-gh-traffic.json ]; then
+            printf '{}' > /tmp/novae-gh-traffic.json
           fi
-          GITEE_COUNT="$(printf '%s' "$GITEE_JSON" | jq -r '.summary.ip // 0' 2>/dev/null || echo 0)"
-          GITEE_ERROR="$(printf '%s' "$GITEE_JSON" | jq -r '.message // empty' 2>/dev/null || true)"
-
-          if ! [[ "$GH_COUNT" =~ ^[0-9]+$ ]]; then GH_COUNT=0; GH_ERROR="GitHub 返回格式异常"; fi
-          if ! [[ "$GITEE_COUNT" =~ ^[0-9]+$ ]]; then GITEE_COUNT=0; GITEE_ERROR="Gitee 返回格式异常"; fi
-          if [ -n "$GH_ERROR" ] || [ -n "$GITEE_ERROR" ]; then
-            PARTIAL=true
-          else
-            PARTIAL=false
+          if [ ! -s /tmp/novae-gitee-traffic.json ]; then
+            printf '{}' > /tmp/novae-gitee-traffic.json
           fi
-          TOTAL=$((GH_COUNT + GITEE_COUNT))
-          UPDATED="$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
 
-          jq -n --argjson github "$GH_COUNT" --argjson gitee "$GITEE_COUNT" --argjson total "$TOTAL" --argjson partial "$PARTIAL" --arg updatedAt "$UPDATED" --arg githubError "$GH_ERROR" --arg giteeError "$GITEE_ERROR" '{snapshot:1,updatedAt:$updatedAt,github:$github,gitee:$gitee,total:$total,githubWindow:"近 14 天",giteeWindow:"近 7 天",partial:$partial,giteeAvailable:($giteeError == ""),note:"GitHub / Gitee 项目页访问次数（含仓库下各页面）"} + (if $githubError != "" then {githubError:$githubError} else {} end) + (if $giteeError != "" then {giteeError:$giteeError} else {} end)' > stats/visits.json
-
-          cat stats/visits.json
+          export GH_TRAFFIC_JSON=/tmp/novae-gh-traffic.json
+          export GITEE_TRAFFIC_JSON=/tmp/novae-gitee-traffic.json
+          python3 tools/update_visit_ledger.py
 
       - name: Commit to GitHub main
         run: |
           set -euo pipefail
           git config user.name "novae-visit-bot"
           git config user.email "noreply@users.noreply.github.com"
-          git add stats/visits.json
+          git add stats/visits.json stats/traffic-ledger.json
           if git diff --cached --quiet; then
             echo "Visit stats unchanged"
           else
-            git commit -m "chore: update project visit stats"
+            git commit -m "chore: update lifetime visit stats"
             git push origin HEAD:main
           fi
 
       - name: Mirror stats to Gitee
         run: |
           set -euo pipefail
-          FILE_PATH="stats/visits.json"
-          SHA="$(curl --http1.1 --connect-timeout 20 --max-time 45 -fsS \
-            -H "Authorization: token ${GITEE_TOKEN}" \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${FILE_PATH}" \
-            | jq -r '.sha // empty' 2>/dev/null || true)"
-          CONTENT="$(base64 -w0 stats/visits.json)"
-          if [ -n "$SHA" ]; then
-            SHA_JSON=",\"sha\":\"${SHA}\""
-          else
-            SHA_JSON=""
-          fi
-          if ! curl --http1.1 --connect-timeout 20 --max-time 60 -fsS -X PUT \
-            -H "Content-Type: application/json" \
-            -d "{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${CONTENT}\",\"message\":\"chore: update project visit stats\"${SHA_JSON}}" \
-            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${FILE_PATH}" >/dev/null; then
-            echo "Gitee mirror warning: contents API update failed; GitHub snapshot remains authoritative."
-          fi
+          mirror_file() {
+            local file_path="$1"
+            local sha=""
+            sha="$(curl --http1.1 --connect-timeout 20 --max-time 45 -sS \
+              -H "Authorization: token ${GITEE_TOKEN}" \
+              "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${file_path}" \
+              | python3 -c 'import json,sys; print(json.load(sys.stdin).get("sha",""))' 2>/dev/null || true)"
+            local content
+            content="$(base64 -w0 "$file_path")"
+            local body
+            if [ -n "$sha" ]; then
+              body="{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${content}\",\"message\":\"chore: update lifetime visit stats\",\"sha\":\"${sha}\"}"
+              curl --http1.1 --connect-timeout 20 --max-time 60 -sS -X PUT \
+                -H "Content-Type: application/json" \
+                -d "$body" \
+                "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${file_path}" >/dev/null || true
+            else
+              body="{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${content}\",\"message\":\"chore: update lifetime visit stats\",\"branch\":\"main\"}"
+              curl --http1.1 --connect-timeout 20 --max-time 60 -sS -X POST \
+                -H "Content-Type: application/json" \
+                -d "$body" \
+                "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${file_path}" >/dev/null || true
+            fi
+          }
+          mirror_file "stats/visits.json"
+          mirror_file "stats/traffic-ledger.json"
+          echo "Gitee mirror completed"
