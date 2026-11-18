@@ -85,5 +85,20 @@ jobs:
       - name: Mirror stats to Gitee
         run: |
           set -euo pipefail
-          git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git"
-          git push --force gitee HEAD:main
+          FILE_PATH="stats/visits.json"
+          SHA="$(curl --http1.1 --connect-timeout 20 --max-time 45 -fsS \
+            -H "Authorization: token ${GITEE_TOKEN}" \
+            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${FILE_PATH}" \
+            | jq -r '.sha // empty' 2>/dev/null || true)"
+          CONTENT="$(base64 -w0 stats/visits.json)"
+          if [ -n "$SHA" ]; then
+            SHA_JSON=",\"sha\":\"${SHA}\""
+          else
+            SHA_JSON=""
+          fi
+          if ! curl --http1.1 --connect-timeout 20 --max-time 60 -fsS -X PUT \
+            -H "Content-Type: application/json" \
+            -d "{\"access_token\":\"${GITEE_TOKEN}\",\"content\":\"${CONTENT}\",\"message\":\"chore: update project visit stats\"${SHA_JSON}}" \
+            "https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/${FILE_PATH}" >/dev/null; then
+            echo "Gitee mirror warning: contents API update failed; GitHub snapshot remains authoritative."
+          fi
