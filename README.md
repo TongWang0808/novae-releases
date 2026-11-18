@@ -29,27 +29,27 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 | 首页 / 登录入口 | 搜索：歌手与专辑 |
 | --- | --- |
-| ![首页](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/01-home.png) | ![搜索](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/02-search.png) |
+| ![首页](docs/readme-1.3.0/01-home.png) | ![搜索](docs/readme-1.3.0/02-search.png) |
 
 | 我喜欢的音乐 | 下载音乐 |
 | --- | --- |
-| ![我喜欢的音乐](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/03-favorites.png) | ![下载音乐](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/04-downloads.png) |
+| ![我喜欢的音乐](docs/readme-1.3.0/03-favorites.png) | ![下载音乐](docs/readme-1.3.0/04-downloads.png) |
 
 | 歌手页：专辑 | 歌手页：歌曲 |
 | --- | --- |
-| ![歌手页专辑](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/05-artist-albums.png) | ![歌手页歌曲](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/06-artist-songs.png) |
+| ![歌手页专辑](docs/readme-1.3.0/05-artist-albums.png) | ![歌手页歌曲](docs/readme-1.3.0/06-artist-songs.png) |
 
 | 歌手页：简介展开 | 沉浸播放器 / 歌词页 |
 | --- | --- |
-| ![歌手页简介](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/07-artist-bio.png) | ![沉浸播放器](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/08-immersive-player.png) |
+| ![歌手页简介](docs/readme-1.3.0/07-artist-bio.png) | ![沉浸播放器](docs/readme-1.3.0/08-immersive-player.png) |
 
 | 设置页：账号 | 最近播放 |
 | --- | --- |
-| ![设置页账号](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/09-settings-account.png) | ![最近播放](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/10-recent-play.png) |
+| ![设置页账号](docs/readme-1.3.0/09-settings-account.png) | ![最近播放](docs/readme-1.3.0/10-recent-play.png) |
 
 | 搜索联想 | 账号详情 |
 | --- | --- |
-| ![搜索联想](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/11-search-suggest.png) | ![账号详情](https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.0/12-account-detail.png) |
+| ![搜索联想](docs/readme-1.3.0/11-search-suggest.png) | ![账号详情](docs/readme-1.3.0/12-account-detail.png) |
 
 ---
 
