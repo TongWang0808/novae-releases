@@ -33,7 +33,7 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 
 | 我喜欢的音乐 | 下载音乐 |
 | --- | --- |
-| ![我喜欢的音乐](docs/readme-1.3.0/03-favorites.png) | ![下载音乐](docs/readme-1.3.0/04-downloads.png) |
+| ![我喜欢的音乐](docs/readme-1.3.0/03-favorites-masked.png) | ![下载音乐](docs/readme-1.3.0/04-downloads.png) |
 
 | 歌手页：专辑 | 歌手页：歌曲 |
 | --- | --- |
