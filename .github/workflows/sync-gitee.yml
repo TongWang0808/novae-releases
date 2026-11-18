@@ -7,8 +7,8 @@ on:
     tags:
       - "v*"        # Release 页面新建 tag 时也会触发；用于兜底 release 事件
   schedule:
-    # 兜底轮询：即使 GitHub 的 release 事件没有触发，也能在 15 分钟内补同步。
-    - cron: "*/15 * * * *"
+    # 兜底轮询：即使 GitHub 的 release 事件没有触发，也能在 5 分钟内补同步。
+    - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
       tag:
