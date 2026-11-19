@@ -1,18 +1,22 @@
 name: Sync to Gitee
 
 on:
-  release:
-    types: [published, created, released]
   push:
+    branches:
+      - main
     tags:
-      - "v*"        # Release 页面新建 tag 时也会触发；用于兜底 release 事件
+      - "v*"
+    paths:
+      - README.md
+  release:
+    types: [published]
   schedule:
-    # 兜底轮询：即使 GitHub 的 release 事件没有触发，也能在 5 分钟内补同步。
+    # Fallback polling in case a release event is missed.
     - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
       tag:
-        description: "Release tag, e.g. v1.2.2. Leave empty to use the latest release."
+        description: "Release tag, e.g. v1.3.2. Leave empty to use the latest release."
         required: false
         default: ""
 
@@ -24,8 +28,65 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check:
+  readme:
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      GITEE_OWNER: meiliwang0808
+      GITEE_REPO: novae-releases
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Mirror README.md to Gitee
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://gitee.com/api/v5/repos/${GITEE_OWNER}/${GITEE_REPO}/contents/README.md"
+
+          base64 -w0 README.md > gh-readme.b64
+
+          curl --http1.1 --retry 3 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 60 -fsSL \
+            "${API}?access_token=${GITEE_TOKEN}" -o gitee-readme.json
+
+          CUR_SHA="$(jq -r '.sha // empty' gitee-readme.json)"
+          jq -r '.content // empty' gitee-readme.json | tr -d '\n\r ' > gitee-readme.b64
+
+          if [ -n "$CUR_SHA" ] && cmp -s gh-readme.b64 gitee-readme.b64; then
+            echo "README already in sync"
+            exit 0
+          fi
+
+          if [ -n "$CUR_SHA" ]; then
+            jq -n --arg message "docs: sync README from GitHub" \
+              --rawfile content gh-readme.b64 --arg sha "$CUR_SHA" --arg branch main \
+              '{message:$message,content:$content,sha:$sha,branch:$branch}' > payload.json
+          else
+            jq -n --arg message "docs: sync README from GitHub" \
+              --rawfile content gh-readme.b64 --arg branch main \
+              '{message:$message,content:$content,branch:$branch}' > payload.json
+          fi
+
+          curl --http1.1 --retry 3 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 20 --max-time 60 -fsSL -X PUT \
+            -H 'Content-Type: application/json' --data-binary @payload.json \
+            "${API}?access_token=${GITEE_TOKEN}" -o result.json
+
+          echo "Gitee README commit: $(jq -r '.commit.sha // "unknown"' result.json)"
+
+  check:
+    if: github.event_name == 'release' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       skip: ${{ steps.precheck.outputs.skip }}
       tag: ${{ steps.precheck.outputs.tag }}
@@ -39,14 +100,18 @@ jobs:
         id: precheck
         env:
           GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            TAG="${{ github.event.inputs.tag }}"
-          elif [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ github.event.release.tag_name }}"
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            TAG="${{ github.ref_name }}"
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          elif [ "$EVENT_NAME" = "release" ]; then
+            TAG="$RELEASE_TAG"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            TAG="$REF_NAME"
           else
             TAG="$(gh release view --json tagName -q .tagName)"
           fi
@@ -54,7 +119,7 @@ jobs:
           echo "skip=false" >> "$GITHUB_OUTPUT"
           VERSION="${TAG#v}"
 
-          # tag push 可能早于 Release 发布：最多等 60 秒，避免空跑。
+          # A tag push can arrive before the Release is published; wait up to 60 seconds.
           FOUND=false
           for i in $(seq 1 12); do
             if gh release view "$TAG" --json tagName -q .tagName >/dev/null 2>&1; then
@@ -94,8 +159,7 @@ jobs:
             echo "GitHub release has no novae.exe; sync needed"
             exit 0
           fi
-          # 大文件 exe 由本机 Novae 同步任务上传；Gitee 附件缺失或大小不符时，
-          # 不再从 GitHub Runner 触发上传，也不让定时任务每 15 分钟重复跑。
+          # The 51MB exe is uploaded by the local Novae sync task. Do not re-upload it here.
           echo "Gitee release and manifest are current; local task owns asset upload"
           echo "skip=true" >> "$GITHUB_OUTPUT"
 
@@ -103,6 +167,9 @@ jobs:
     needs: check
     if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
     env:
       GITEE_OWNER: meiliwang0808
       GITEE_REPO: novae-releases
@@ -227,8 +294,7 @@ jobs:
           fi
           echo "release_id=$REL_ID" >> "$GITHUB_OUTPUT"
 
-          # 51MB exe 由本机 Novae Gitee 同步任务上传，GitHub Runner 不再执行跨国大文件上传。
-          # 这样可避免 curl (28) 180 秒超时，也避免 Actions 删除本机刚上传的附件。
+          # The 51MB exe is uploaded by the local Novae Gitee sync task.
 
       - name: Verify Gitee release asset
         continue-on-error: true
@@ -239,7 +305,7 @@ jobs:
           ATT_JSON="$(curl --http1.1 --connect-timeout 20 --max-time 60 -fsS "${API}/releases/${REL_ID}/attach_files?access_token=${GITEE_TOKEN}")"
           URL="$(printf '%s' "$ATT_JSON" | jq -r '.[0].browser_download_url // empty')"
           if [ -z "$URL" ]; then
-            echo "::warning::Gitee 附件尚未上传；本机同步任务会在 5 分钟内补传。"
+            echo "::warning::Gitee asset not uploaded yet; the local sync task will upload it."
             exit 0
           fi
           echo "Gitee asset: $URL"
