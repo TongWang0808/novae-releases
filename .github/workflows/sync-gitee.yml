@@ -19,6 +19,11 @@ on:
         description: "Release tag, e.g. v1.3.2. Leave empty to use the latest release."
         required: false
         default: ""
+      force:
+        description: "Force a full repository mirror even if the release is already current."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,7 +34,7 @@ concurrency:
 
 jobs:
   readme:
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -104,6 +109,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
           REF_NAME: ${{ github.ref_name }}
+          FORCE: ${{ github.event.inputs.force }}
         run: |
           set -euo pipefail
           if [ -n "$INPUT_TAG" ]; then
@@ -118,6 +124,11 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
           VERSION="${TAG#v}"
+
+          if [ "$FORCE" = "true" ]; then
+            echo "Force full repository mirror requested; skipping the current-state precheck"
+            exit 0
+          fi
 
           # A tag push can arrive before the Release is published; wait up to 60 seconds.
           FOUND=false
@@ -266,10 +277,46 @@ jobs:
             git push origin HEAD:main
           fi
 
-      # Do not mirror the whole repository with `git push --force`.
-      # Gitee rejects force-pushes to main with `incorrect old value provided`;
-      # README is synced by the `readme` job via the Gitee API, and the release
-      # API creates any missing tag from `target_commitish` below.
+      - name: Mirror repository to Gitee
+        run: |
+          set -euo pipefail
+          git config user.name "novae-release-bot"
+          git config user.email "noreply@users.noreply.github.com"
+          git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git"
+
+          # Gitee rejects `--force` pushes to main when its old value changed
+          # (for example, a README API commit or a local sync racing this job).
+          # Merge Gitee main into HEAD with `-s ours`: the resulting tree is
+          # exactly GitHub main, while Gitee main becomes an ancestor, so the
+          # push is a normal fast-forward and cannot trigger the old-value guard.
+          for attempt in 1 2 3; do
+            if ! git fetch gitee main; then
+              echo "Fetch from Gitee failed (attempt ${attempt}/3)" >&2
+              if [ "${attempt}" -eq 3 ]; then
+                exit 1
+              fi
+              sleep 10
+              continue
+            fi
+
+            git merge --no-edit -s ours --allow-unrelated-histories gitee/main
+
+            if git push gitee HEAD:main; then
+              echo "Gitee main synced on attempt ${attempt}/3"
+              break
+            fi
+
+            if [ "${attempt}" -eq 3 ]; then
+              echo "Gitee main sync failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "Gitee main moved during push; retrying..."
+            sleep 10
+          done
+
+          # Sync tags too. Existing divergent tags must not fail the whole run;
+          # the Gitee release API below owns release/tag creation.
+          git push gitee --tags --force || echo "Some tags could not be updated; release API will manage release tags."
 
       - name: Create or update Gitee release
         id: gitee_release
@@ -307,4 +354,5 @@ jobs:
             exit 0
           fi
           echo "Gitee asset: $URL"
+
 
