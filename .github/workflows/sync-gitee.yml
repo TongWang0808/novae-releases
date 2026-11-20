@@ -266,12 +266,10 @@ jobs:
             git push origin HEAD:main
           fi
 
-      - name: Mirror repository to Gitee
-        run: |
-          set -euo pipefail
-          git remote add gitee "https://${GITEE_OWNER}:${GITEE_TOKEN}@gitee.com/${GITEE_OWNER}/${GITEE_REPO}.git"
-          git push --force gitee HEAD:main
-          git push --force --tags gitee
+      # Do not mirror the whole repository with `git push --force`.
+      # Gitee rejects force-pushes to main with `incorrect old value provided`;
+      # README is synced by the `readme` job via the Gitee API, and the release
+      # API creates any missing tag from `target_commitish` below.
 
       - name: Create or update Gitee release
         id: gitee_release
@@ -309,3 +307,4 @@ jobs:
             exit 0
           fi
           echo "Gitee asset: $URL"
+
