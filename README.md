@@ -31,29 +31,53 @@ Novae 是一个用 **Wails（Go + WebView2）** 构建的桌面音乐客户端�
 | --- |
 | ![推荐页 · 等你探索](docs/readme-1.3.5/01-recommend.png) |
 
-| 最近播放 · 平台同步 | 沉浸播放页面 |
-| --- | --- |
-| ![最近播放 · 平台同步](docs/readme-1.3.5/02-history-sync.png) | ![沉浸播放页面](docs/readme-1.3.0/01-immersive-player.png) |
+| 最近播放 · 平台同步 |
+| --- |
+| ![最近播放 · 平台同步](docs/readme-1.3.5/02-history-sync.png) |
 
-| 沉浸光感与按压形变 | 多种外观选择 |
-| --- | --- |
-| ![沉浸光感与按压形变](docs/readme-1.3.0/02-immersive-press.png) | ![多种外观选择](docs/readme-1.3.0/03-themes.png) |
+| 沉浸播放页面 |
+| --- |
+| ![沉浸播放页面](docs/readme-1.3.0/01-immersive-player.png) |
 
-| 歌手大卡片 | 歌手卡片吸顶和歌曲展示 |
-| --- | --- |
-| ![歌手大卡片](docs/readme-1.3.0/04-artist-card.png) | ![歌手卡片吸顶和歌曲展示](docs/readme-1.3.0/05-artist-songs.png) |
+| 沉浸光感与按压形变 |
+| --- |
+| ![沉浸光感与按压形变](docs/readme-1.3.0/02-immersive-press.png) |
 
-| 歌手专辑 | 加入群聊反馈 |
-| --- | --- |
-| ![歌手专辑](docs/readme-1.3.0/06-artist-albums.png) | ![加入群聊反馈](docs/readme-1.3.0/07-qq-group.png) |
+| 多种外观选择 |
+| --- |
+| ![多种外观选择](docs/readme-1.3.0/03-themes.png) |
 
-| 联想搜索与历史记录 | 平台歌单 |
-| --- | --- |
-| ![联想搜索与历史记录](docs/readme-1.3.0/08-search-suggest.png) | ![平台歌单](docs/readme-1.3.0/09-platform-playlists.png) |
+| 歌手大卡片 |
+| --- |
+| ![歌手大卡片](docs/readme-1.3.0/04-artist-card.png) |
 
-| 平台账户卡片 | 账号管理页面 |
-| --- | --- |
-| ![平台账户卡片](docs/readme-1.3.0/10-platform-accounts.png) | ![账号管理页面](docs/readme-1.3.0/11-account-manage.png) |
+| 歌手卡片吸顶和歌曲展示 |
+| --- |
+| ![歌手卡片吸顶和歌曲展示](docs/readme-1.3.0/05-artist-songs.png) |
+
+| 歌手专辑 |
+| --- |
+| ![歌手专辑](docs/readme-1.3.0/06-artist-albums.png) |
+
+| 加入群聊反馈 |
+| --- |
+| ![加入群聊反馈](docs/readme-1.3.0/07-qq-group.png) |
+
+| 联想搜索与历史记录 |
+| --- |
+| ![联想搜索与历史记录](docs/readme-1.3.0/08-search-suggest.png) |
+
+| 平台歌单 |
+| --- |
+| ![平台歌单](docs/readme-1.3.0/09-platform-playlists.png) |
+
+| 平台账户卡片 |
+| --- |
+| ![平台账户卡片](docs/readme-1.3.0/10-platform-accounts.png) |
+
+| 账号管理页面 |
+| --- |
+| ![账号管理页面](docs/readme-1.3.0/11-account-manage.png) |
 
 | 我喜欢的音乐 |
 | --- |
