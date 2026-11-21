@@ -2,7 +2,7 @@
 
 更新日期：2026-11-21
 
-适用版本：Novae 1.3.5（Windows x64）
+适用版本：Novae 1.3.6（Windows x64）
 
 Novae 本体采用 MIT License，见仓库根目录 `LICENSE`。本文件列出 Novae 在产品中实际使用、参考或分发的第三方项目及许可证信息。
 
@@ -105,7 +105,7 @@ Node.js 本身采用 MIT 许可证；其完整许可证与第三方声明见 Nod
 
 ***
 
-## 3. 接口、协议与数据参考
+## 3. 接口、协议、数据与外部服务
 
 
 
@@ -117,6 +117,7 @@ Node.js 本身采用 MIT 许可证；其完整许可证与第三方声明见 Nod
 | QQMusicApi                      | GPL-3.0                               | 可选的本机 QQ API，补歌单、喜欢、最近播放等                                         | 否，用户自行运行     | [https://github.com/jsososo/QQMusicApi](https://github.com/jsososo/QQMusicApi)                                                   |
 | qqmusic-dl                      | MIT                                   | QQ CDN 文件前缀表交叉核对                                                  | 否，仅数据参考      | [https://github.com/menghuanshiguang/qqmusic-dl](https://github.com/menghuanshiguang/qqmusic-dl)                                 |
 | QQ\_music\_direct\_link\_export | GPL-3.0                               | QQ CDN 文件前缀表交叉核对                                                  | 否，仅数据参考      | [https://github.com/DreamWalkerXZ/QQ\_music\_direct\_link\_export](https://github.com/DreamWalkerXZ/QQ_music_direct_link_export) |
+| Supabase                        | Apache-2.0（开源部分）；托管服务按 Supabase 条款    | 匿名使用人数计数（PostgreSQL + PostgREST RPC），客户端仅通过 HTTPS 调用                  | 否，托管服务       | [https://supabase.com](https://supabase.com)                                                                                     |
 
 QQ CDN 前缀表用于以下档位映射：
 
@@ -250,7 +251,7 @@ GitHub Actions 同步模板仅使用 `actions/checkout`（MIT），不属于应�
 
 * **NeteaseCloudMusicApi**：GitHub 仓库已归档且当前无 LICENSE 文件；npm 包标注 MIT。后续维护优先使用 `api-enhanced`（MIT）。
 
-* **Abacus**：安装量计数托管服务，源码公开但仓库未标注许可证；Novae 仅通过 HTTP 调用其服务。
+* **Supabase**：匿名使用人数计数托管服务（PostgreSQL + PostgREST）；开源部分采用 Apache-2.0，托管服务按其服务条款使用。Novae 仅通过 HTTPS 调用部署在本项目的 REST RPC，不随包分发其代码。
 
 * **go-toast**：Wails 运行时依赖，上游仓库未显示许可证文件；建议在正式分发前向上游确认。
 
