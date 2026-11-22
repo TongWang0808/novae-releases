@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Novae · 实时使用人数</title>
+<meta name="description" content="Novae 匿名使用人数实时统计页。">
+<style>
+  :root {
+    --bg: #0a0a0d;
+    --panel: rgba(24, 22, 28, 0.72);
+    --line: rgba(255, 255, 255, 0.12);
+    --text: #f6f3f5;
+    --dim: #a8a1ab;
+    --faint: #746d78;
+    --pink: #ff7aa8;
+    --peach: #ffb38f;
+    --good: #8de7c1;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    background:
+      radial-gradient(900px 420px at 18% -12%, rgba(255, 112, 166, 0.24), transparent 62%),
+      radial-gradient(760px 500px at 92% 8%, rgba(255, 176, 131, 0.17), transparent 60%),
+      radial-gradient(900px 600px at 50% 118%, rgba(126, 92, 255, 0.10), transparent 65%),
+      var(--bg);
+    font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.32;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(to bottom, #000, transparent 72%);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  }
+  .page {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 28px 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex: none;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .mark {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    font: 800 23px/1 "Georgia", serif;
+    color: #2a0714;
+    background: linear-gradient(138deg, var(--peach), var(--pink) 62%, #ffd0e0);
+    box-shadow: 0 0 34px rgba(255, 112, 166, 0.28), inset 0 1px 0 rgba(255,255,255,0.55);
+  }
+  .brand h1 { margin: 0; font-size: 20px; letter-spacing: 0.16em; font-weight: 700; }
+  .brand p { margin: 4px 0 0; color: var(--dim); font-size: 12px; letter-spacing: 0.10em; }
+  .live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    border: 1px solid rgba(141, 231, 193, 0.22);
+    border-radius: 999px;
+    color: var(--good);
+    background: rgba(141, 231, 193, 0.07);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 12px var(--good);
+    animation: breathe 2.2s ease-in-out infinite;
+  }
+  @keyframes breathe { 50% { opacity: 0.42; transform: scale(0.84); } }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px 0 10px;
+  }
+  .card {
+    position: relative;
+    width: min(760px, 100%);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 44px 44px 34px;
+    background:
+      radial-gradient(540px 220px at 88% -8%, rgba(255, 140, 176, 0.16), transparent 65%),
+      linear-gradient(150deg, rgba(255,255,255,0.075), rgba(255,255,255,0.028) 42%, rgba(255,255,255,0.018));
+    backdrop-filter: blur(30px) saturate(135%);
+    -webkit-backdrop-filter: blur(30px) saturate(135%);
+    box-shadow:
+      0 34px 90px rgba(0,0,0,0.46),
+      inset 0 1px 0 rgba(255,255,255,0.14),
+      inset 0 -1px 0 rgba(255,255,255,0.035);
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--dim);
+    font-size: 11px;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--pink), transparent);
+  }
+  .count-line {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    margin: 18px 0 4px;
+    min-height: 112px;
+  }
+  .count {
+    font: 700 clamp(64px, 10vw, 112px)/0.92 "Georgia", "Times New Roman", serif;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(180deg, #fff 8%, #ffd6e2 56%, #ff9fbd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 10px 34px rgba(255, 112, 166, 0.28));
+  }
+  .unit { color: var(--dim); font-size: 13px; padding-bottom: 12px; letter-spacing: 0.10em; }
+  .subtitle { margin: 0; color: var(--dim); font-size: 13px; line-height: 1.8; max-width: 520px; }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .meta-item { padding: 3px 12px 2px 0; }
+  .meta-item span { display: block; color: var(--faint); font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase; }
+  .meta-item b { display: block; margin-top: 7px; color: #ddd6de; font-size: 13px; font-weight: 600; }
+  .refresh-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .stamp { color: var(--faint); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+  .actions { display: flex; gap: 10px; }
+  button, a {
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 15px;
+    border-radius: 11px;
+    border: 1px solid rgba(255,255,255,0.13);
+    color: var(--text);
+    background: rgba(255,255,255,0.055);
+    font-size: 12px;
+    transition: transform .16s ease, background .16s ease, border-color .16s ease;
+  }
+  .btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.20); }
+  .btn:active { transform: scale(0.96); }
+  .btn.primary {
+    color: #2a0714;
+    border-color: rgba(255, 167, 195, 0.7);
+    background: linear-gradient(135deg, #ffd0df, #ff9fbe);
+    box-shadow: 0 8px 26px rgba(255, 112, 166, 0.20);
+  }
+  .btn.primary:hover { background: linear-gradient(135deg, #ffe0eb, #ffb0c9); }
+  .btn:disabled { opacity: 0.5; cursor: wait; }
+  .btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .eq { display: flex; align-items: flex-end; gap: 4px; height: 26px; margin-top: 8px; }
+  .eq i {
+    display: block;
+    width: 4px;
+    border-radius: 4px;
+    background: linear-gradient(to top, rgba(255,122,168,0.28), rgba(255,122,168,0.92));
+    animation: eq 1.2s ease-in-out infinite;
+  }
+  .eq i:nth-child(1) { height: 8px; animation-delay: -.9s; }
+  .eq i:nth-child(2) { height: 14px; animation-delay: -.4s; }
+  .eq i:nth-child(3) { height: 22px; animation-delay: -.7s; }
+  .eq i:nth-child(4) { height: 11px; animation-delay: -.2s; }
+  .eq i:nth-child(5) { height: 18px; animation-delay: -.6s; }
+  @keyframes eq { 50% { transform: scaleY(0.38); opacity: 0.46; } }
+
+  footer {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 22px;
+    color: var(--faint);
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  footer a { color: #bab2bd; }
+  footer a:hover { color: #fff; }
+  .error {
+    margin-top: 10px;
+    color: #ffb3bd;
+    font-size: 11.5px;
+    min-height: 17px;
+  }
+  @media (max-width: 720px) {
+    .page { padding: 20px 18px 16px; }
+    .card { padding: 30px 24px 24px; border-radius: 22px; }
+    .count-line { min-height: 84px; }
+    .count { font-size: clamp(54px, 16vw, 80px); }
+    .meta { grid-template-columns: 1fr 1fr; }
+    .meta-item:last-child { grid-column: 1 / -1; }
+    footer { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <div class="mark">N</div>
+      <div>
+        <h1>NOVAE</h1>
+        <p>匿名使用人数 · 实时统计</p>
+      </div>
+    </div>
+    <div class="live"><i class="dot"></i><span>LIVE</span></div>
+  </header>
+
+  <main>
+    <section class="card" aria-live="polite">
+      <div class="eyebrow">USAGE COUNTER</div>
+      <div class="count-line">
+        <div class="count" id="count">--</div>
+        <div class="unit">台设备</div>
+        <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <p class="subtitle">每台电脑首次启动 Novae 时匿名计数一次。这里显示的是累计设备数，不是在线人数。</p>
+      <div class="error" id="error"></div>
+
+      <div class="meta">
+        <div class="meta-item"><span>数据来源</span><b>Supabase RPC</b></div>
+        <div class="meta-item"><span>刷新频率</span><b>30 秒</b></div>
+        <div class="meta-item"><span>计数方式</span><b>匿名设备 · 仅首次</b></div>
+      </div>
+
+      <div class="refresh-line">
+        <div class="stamp" id="stamp">正在读取…</div>
+        <div class="actions">
+          <button class="btn" id="refresh" type="button" title="立即刷新">
+            <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+            刷新
+          </button>
+          <a class="btn primary" href="https://github.com/TongWang0808/novae-releases/releases/latest" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+            下载 Novae
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>只做匿名设备计数，不采集账号、硬件信息或曲库内容。</span>
+    <span><a href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub</a> · <a href="https://gitee.com/meiliwang0808/novae-releases" target="_blank" rel="noopener">Gitee</a></span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const ENDPOINT = "https://rknetrmcfwrolfrgjoiz.supabase.co/rest/v1/rpc/novae_usage_get";
+  const KEY = "sb_publishable_tTgoX2sVh5pYkaoxXhssuA_n_pkhBE_";
+  const INTERVAL = 30000;
+  const $count = document.getElementById("count");
+  const $stamp = document.getElementById("stamp");
+  const $error = document.getElementById("error");
+  const $refresh = document.getElementById("refresh");
+  let value = null;
+  let timer = 0;
+  let busy = false;
+
+  const fmt = (n) => new Intl.NumberFormat("zh-CN").format(n);
+
+  function paint(n) {
+    const target = Number(n);
+    if (!Number.isFinite(target)) return;
+    $count.textContent = fmt(target);
+    if (value === null || Math.abs(target - value) < 2) {
+      value = target;
+      return;
+    }
+    const from = value;
+    const started = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - started) / 700);
+      const eased = 1 - Math.pow(1 - t, 3);
+      $count.textContent = fmt(Math.round(from + (target - from) * eased));
+      if (t < 1) requestAnimationFrame(tick);
+      else value = target;
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function parse(payload) {
+    if (typeof payload === "number") return payload;
+    if (typeof payload === "string" && payload.trim()) return Number(payload);
+    if (Array.isArray(payload)) return parse(payload[0]);
+    if (payload && typeof payload === "object") {
+      for (const key of ["value", "count", "total", "usage_count"]) {
+        if (key in payload) return parse(payload[key]);
+      }
+    }
+    return NaN;
+  }
+
+  async function load() {
+    if (busy) return;
+    busy = true;
+    $refresh.disabled = true;
+    $error.textContent = "";
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "apikey": KEY,
+          "Authorization": "Bearer " + KEY,
+          "Content-Type": "application/json",
+        },
+        body: "{}",
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const payload = await res.json();
+      const next = parse(payload);
+      if (!Number.isFinite(next) || next < 0) throw new Error("返回值无法识别");
+      paint(next);
+      $stamp.textContent = "最后更新 " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
+    } catch (err) {
+      const cached = Number(localStorage.getItem("novae-usage-last"));
+      if (Number.isFinite(cached) && cached >= 0) {
+        paint(cached);
+        $stamp.textContent = "离线缓存 · " + new Date(Number(localStorage.getItem("novae-usage-at") || 0)).toLocaleString("zh-CN", { hour12: false });
+      } else {
+        $stamp.textContent = "读取失败";
+      }
+      $error.textContent = "暂时无法连接统计服务：" + (err && err.message ? err.message : "网络错误");
+    } finally {
+      if (Number.isFinite(value)) {
+        localStorage.setItem("novae-usage-last", String(value));
+        localStorage.setItem("novae-usage-at", String(Date.now()));
+      }
+      busy = false;
+      $refresh.disabled = false;
+      clearTimeout(timer);
+      timer = window.setTimeout(load, INTERVAL);
+    }
+  }
+
+  $refresh.addEventListener("click", load);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) load();
+  });
+  load();
+})();
+</script>
+</body>
+</html>
