@@ -47,10 +47,15 @@ jobs:
           if [ ! -s /tmp/novae-gitee-traffic.json ]; then
             printf '{}' > /tmp/novae-gitee-traffic.json
           fi
-          # Abacus 的使用人数 counter 是公共免账号计数器；每 5 分钟读一次，
-          # 既保持它在 6 个月 TTL 内不失效，也不增加计数。
+          # 使用人数已经迁移到 Supabase，由 novae_usage_get / novae_usage_hit 两个 RPC 托管。
+          # 每 5 分钟只读调用一次 get，保持免费项目活跃，不增加计数。
           curl --http1.1 --connect-timeout 15 --max-time 30 -sS \
-            "https://abacus.jasoncameron.dev/get/novae-releases/installs" >/dev/null || true
+            -X POST \
+            -H "apikey: sb_publishable_tTgoX2sVh5pYkaoxXhssuA_n_pkhBE_" \
+            -H "Authorization: Bearer sb_publishable_tTgoX2sVh5pYkaoxXhssuA_n_pkhBE_" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "https://rknetrmcfwrolfrgjoiz.supabase.co/rest/v1/rpc/novae_usage_get" >/dev/null || true
           export GH_TRAFFIC_JSON=/tmp/novae-gh-traffic.json
           export GITEE_TRAFFIC_JSON=/tmp/novae-gitee-traffic.json
           python3 tools/update_visit_ledger.py
