@@ -173,7 +173,60 @@
   .window-bar i:nth-child(2) { background: #ffbd8a; }
   .window-bar i:nth-child(3) { background: #8ee0bd; }
   .window-bar span { margin-left: 8px; color: var(--faint); font-size: 10px; letter-spacing: .10em; }
-  .window img { width: 100%; aspect-ratio: 1540/912; object-fit: cover; }
+  .hero-carousel {
+    position: relative; overflow: hidden; aspect-ratio: 1540 / 912;
+    background: #07070b; touch-action: pan-y;
+  }
+  .hero-track {
+    display: flex; height: 100%;
+    transition: transform .58s cubic-bezier(.22,.75,.24,1);
+  }
+  .hero-slide { position: relative; flex: 0 0 100%; height: 100%; margin: 0; }
+  .hero-slide img {
+    display: block; width: 100%; height: 100%; object-fit: cover;
+    aspect-ratio: auto; user-select: none; -webkit-user-drag: none;
+  }
+  .hero-slide[aria-hidden="true"] { pointer-events: none; }
+  .hero-carousel::after {
+    content: ""; position: absolute; inset: auto 0 0; height: 120px; z-index: 2;
+    background: linear-gradient(180deg, transparent, rgba(5,5,8,.72));
+    pointer-events: none;
+  }
+  .hero-arrow {
+    position: absolute; top: 50%; z-index: 6; display: grid; place-items: center;
+    width: 42px; height: 42px; margin-top: -21px; padding: 0;
+    border: 1px solid rgba(255,255,255,.20); border-radius: 50%;
+    background: rgba(9,9,14,.58); color: #fff; cursor: pointer;
+    backdrop-filter: blur(14px);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .hero-arrow:hover, .hero-arrow:focus-visible {
+    background: rgba(255,143,177,.72); border-color: rgba(255,255,255,.55); transform: scale(1.06);
+    outline: none;
+  }
+  .hero-arrow.prev { left: 16px; }
+  .hero-arrow.next { right: 16px; }
+  .hero-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .hero-caption {
+    position: absolute; left: 20px; bottom: 18px; z-index: 5;
+    display: flex; flex-direction: column; gap: 5px; max-width: 62%;
+    pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.7);
+  }
+  .hero-counter { color: rgba(255,196,216,.9); font-size: 10px; letter-spacing: .16em; font-variant-numeric: tabular-nums; }
+  .hero-caption strong { color: #fff; font-size: 14px; font-weight: 600; line-height: 1.35; letter-spacing: .01em; }
+  .hero-dots {
+    position: absolute; left: 50%; bottom: 18px; z-index: 6; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 5px; padding: 6px 9px;
+    border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+    background: rgba(8,8,13,.48); backdrop-filter: blur(12px);
+  }
+  .hero-dot {
+    width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px;
+    background: rgba(255,255,255,.34); cursor: pointer;
+    transition: width .2s ease, background .2s ease;
+  }
+  .hero-dot[aria-selected="true"] { width: 18px; background: var(--pink-2); }
+  .hero-dot:focus-visible { outline: 1px solid rgba(255,255,255,.8); outline-offset: 3px; }
   .hero-badge {
     position: absolute; right: -8px; bottom: 24px;
     display: flex; align-items: center; gap: 9px;
@@ -231,8 +284,9 @@
   .feature p { margin: 0; color: var(--dim); font-size: 12.5px; line-height: 1.8; }
   .feature .tag { display: inline-block; margin-top: 17px; padding: 5px 9px; border-radius: 7px; color: var(--faint); background: rgba(255,255,255,.045); font-size: 10px; letter-spacing: .06em; }
   .feature.wide { grid-column: span 2; }
-  .feature.wide p { max-width: 520px; }
-  .feature.wide::after {
+  .feature.full { grid-column: span 3; }
+  .feature.wide p, .feature.full p { max-width: 520px; }
+  .feature.wide::after, .feature.full::after {
     content: ""; position: absolute; width: 240px; height: 240px; right: -70px; bottom: -90px;
     background: radial-gradient(circle, rgba(255,112,166,.20), transparent 68%);
   }
@@ -318,7 +372,7 @@
     .stat + .stat { border-left: none; border-top: 1px solid rgba(255,255,255,.08); }
     .stat:nth-child(even) { border-left: 1px solid rgba(255,255,255,.08); }
     .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .feature.wide { grid-column: span 2; }
+    .feature.wide, .feature.full { grid-column: span 2; }
     .download-card { grid-template-columns: 1fr; gap: 28px; padding: 32px; }
   }
   @media (max-width: 760px) {
@@ -334,9 +388,15 @@
     .section { padding-top: 72px; }
     .section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
     .features { grid-template-columns: 1fr; }
-    .feature.wide { grid-column: span 1; }
+    .feature.wide, .feature.full { grid-column: span 1; }
     .gallery { grid-template-columns: 1fr; }
     .shot, .shot.big, .shot.third { grid-column: span 1; }
+    .hero-arrow { width: 34px; height: 34px; margin-top: -17px; }
+    .hero-arrow.prev { left: 9px; }
+    .hero-arrow.next { right: 9px; }
+    .hero-caption { left: 12px; bottom: 44px; max-width: calc(100% - 120px); }
+    .hero-caption strong { font-size: 12.5px; }
+    .hero-dots { bottom: 12px; padding: 5px 7px; }
     .stat { padding: 20px; }
     .stat .value { font-size: 32px; }
     .download-card { padding: 26px 21px; }
@@ -396,8 +456,40 @@
     </div>
     <div class="hero-stage reveal">
       <div class="window">
-        <div class="window-bar"><i></i><i></i><i></i><span>NOVAE · IMMERSIVE PLAYER</span></div>
-        <img src="assets/01-immersive-player.png" alt="Novae 沉浸播放页面">
+        <div class="window-bar"><i></i><i></i><i></i><span id="heroWindowLabel">NOVAE · IMMERSIVE PLAYER</span></div>
+        <div class="hero-carousel" id="heroCarousel" role="region" aria-roledescription="carousel" aria-label="Novae 界面截图轮播">
+          <div class="hero-track" id="heroTrack">
+            <figure class="hero-slide" data-kicker="IMMERSIVE PLAYER" data-title="沉浸播放与逐行歌词">
+              <img src="assets/01-immersive-player.png" alt="Novae 沉浸播放与逐行歌词" loading="eager" decoding="async">
+            </figure>
+            <figure class="hero-slide" data-kicker="RECOMMEND" data-title="推荐首页与每日专辑">
+              <img src="assets/13-recommend.png" alt="Novae 推荐首页与每日专辑" loading="eager" decoding="async">
+            </figure>
+            <figure class="hero-slide" data-kicker="SEARCH" data-title="歌手 / 专辑 / 歌曲三级搜索">
+              <img src="assets/14-search.png" alt="Novae 三级搜索结果" loading="eager" decoding="async">
+            </figure>
+            <figure class="hero-slide" data-kicker="HISTORY" data-title="跨平台最近播放">
+              <img src="assets/15-history-sync.png" alt="Novae 跨平台最近播放" loading="eager" decoding="async">
+            </figure>
+            <figure class="hero-slide" data-kicker="THEMES" data-title="12 套主题与玻璃表面">
+              <img src="assets/03-themes.png" alt="Novae 12 套主题与玻璃表面" loading="eager" decoding="async">
+            </figure>
+            <figure class="hero-slide" data-kicker="DOWNLOADS" data-title="批量下载与音质校验">
+              <img src="assets/16-downloads.png" alt="Novae 批量下载与音质校验" loading="eager" decoding="async">
+            </figure>
+          </div>
+          <button class="hero-arrow prev" id="heroPrev" type="button" aria-label="上一张截图">
+            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button class="hero-arrow next" id="heroNext" type="button" aria-label="下一张截图">
+            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="hero-caption">
+            <span class="hero-counter" id="heroCounter" aria-live="polite">01 / 06</span>
+            <strong id="heroTitle">沉浸播放与逐行歌词</strong>
+          </div>
+          <div class="hero-dots" id="heroDots" role="tablist" aria-label="截图分页"></div>
+        </div>
       </div>
       <div class="hero-badge"><span class="live-dot"></span><span id="heroUsage">LIVE · 正在读取使用人数</span></div>
     </div>
@@ -469,7 +561,7 @@
       <p>搜索页分歌手、专辑、歌曲三级结果，歌手页有大卡片、简介展开与歌曲排序；搜索联想和最近搜索都在输入框下方自然接住。</p>
       <span class="tag">三级结果 · 卡片光效</span>
     </article>
-    <article class="feature wide reveal">
+    <article class="feature full reveal">
       <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.34-5.66"/><path d="M20 4v5h-5"/></svg></div>
       <h3>双源更新，不强制、不自动下载</h3>
       <p>GitHub 不稳定时可以切到 Gitee 检查更新。发现新版本只亮红点和更新说明，下不下载由你决定；设置页「关于」还能直接看到版本、校验值与使用人数。</p>
@@ -484,46 +576,42 @@
       <div class="section-kicker">REAL SCREENS</div>
       <h2>这些不是概念稿，<br>是正在运行的界面。</h2>
     </div>
-    <p class="section-lead">以下截图直接来自 Novae 的 GitHub 仓库 README，覆盖推荐、搜索、最近播放、沉浸播放、主题、歌手页、平台歌单、下载与「我喜欢的音乐」的真实状态。</p>
+    <p class="section-lead">顶部轮播和下方九张截图都来自 Novae 的真实运行界面，覆盖推荐、搜索、最近播放、沉浸播放、主题、歌手页、平台歌单、下载与「我喜欢的音乐」。</p>
   </div>
   <div class="gallery">
-    <button class="shot big reveal" type="button" data-full="assets/01-immersive-player.png">
-      <img src="assets/01-immersive-player.png" alt="Novae 沉浸播放器" loading="lazy">
-      <figcaption>沉浸播放器与逐行歌词 <span>GITHUB · README</span></figcaption>
-    </button>
-    <button class="shot reveal" type="button" data-full="assets/13-recommend.png">
+    <button class="shot third reveal" type="button" data-full="assets/13-recommend.png">
       <img src="assets/13-recommend.png" alt="Novae 推荐首页" loading="lazy">
       <figcaption>推荐首页 <span>RECOMMEND</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/14-search.png">
+    <button class="shot third reveal" type="button" data-full="assets/14-search.png">
       <img src="assets/14-search.png" alt="Novae 搜索页" loading="lazy">
       <figcaption>三级搜索结果 <span>SEARCH</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/15-history-sync.png">
+    <button class="shot third reveal" type="button" data-full="assets/15-history-sync.png">
       <img src="assets/15-history-sync.png" alt="Novae 最近播放" loading="lazy">
       <figcaption>跨平台最近播放 <span>HISTORY</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/16-downloads.png">
+    <button class="shot third reveal" type="button" data-full="assets/16-downloads.png">
       <img src="assets/16-downloads.png" alt="Novae 下载管理" loading="lazy">
       <figcaption>批量下载与音质 <span>DOWNLOADS</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/02-immersive-press.png">
+    <button class="shot third reveal" type="button" data-full="assets/02-immersive-press.png">
       <img src="assets/02-immersive-press.png" alt="Novae 设置页与沉浸光感" loading="lazy">
       <figcaption>设置页与沉浸光感 <span>SETTINGS</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/03-themes.png">
+    <button class="shot third reveal" type="button" data-full="assets/03-themes.png">
       <img src="assets/03-themes.png" alt="Novae 多种外观选择" loading="lazy">
       <figcaption>多种外观选择 <span>12 套主题</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/04-artist-card.png">
+    <button class="shot third reveal" type="button" data-full="assets/04-artist-card.png">
       <img src="assets/04-artist-card.png" alt="Novae 歌手大卡片" loading="lazy">
       <figcaption>歌手大卡片 <span>ARTIST</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/09-platform-playlists.png">
+    <button class="shot third reveal" type="button" data-full="assets/09-platform-playlists.png">
       <img src="assets/09-platform-playlists.png" alt="Novae 平台歌单" loading="lazy">
       <figcaption>平台歌单 <span>PLAYLISTS</span></figcaption>
     </button>
-    <button class="shot reveal" type="button" data-full="assets/12-likes.png">
+    <button class="shot third reveal" type="button" data-full="assets/12-likes.png">
       <img src="assets/12-likes.png" alt="Novae 我喜欢的音乐" loading="lazy">
       <figcaption>我喜欢的音乐 <span>FAVORITES</span></figcaption>
     </button>
@@ -750,6 +838,92 @@
   $("lightboxClose").addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", (event) => { if (event.target === lightbox) closeLightbox(); });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeLightbox(); });
+
+  // hero carousel
+  const heroCarousel = $("heroCarousel");
+  const heroTrack = $("heroTrack");
+  const heroSlides = heroCarousel ? Array.from(heroCarousel.querySelectorAll(".hero-slide")) : [];
+  if (heroCarousel && heroTrack && heroSlides.length) {
+    const heroDots = $("heroDots");
+    const heroCounter = $("heroCounter");
+    const heroTitle = $("heroTitle");
+    const heroWindowLabel = $("heroWindowLabel");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let heroIndex = 0;
+    let heroTimer = 0;
+
+    heroSlides.forEach((slide, index) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "hero-dot";
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", "第 " + (index + 1) + " 张：" + (slide.dataset.title || "界面截图"));
+      dot.addEventListener("click", () => goHero(index, true));
+      heroDots.appendChild(dot);
+    });
+    const dots = Array.from(heroDots.children);
+
+    function stopHero() {
+      if (heroTimer) { window.clearInterval(heroTimer); heroTimer = 0; }
+    }
+    function scheduleHero() {
+      stopHero();
+      if (!reduceMotion.matches) heroTimer = window.setInterval(() => goHero(heroIndex + 1), 6400);
+    }
+    function goHero(next, userAction) {
+      const total = heroSlides.length;
+      heroIndex = ((next % total) + total) % total;
+      heroTrack.style.transform = "translate3d(-" + (heroIndex * heroCarousel.clientWidth) + "px,0,0)";
+      heroSlides.forEach((slide, index) => {
+        const active = index === heroIndex;
+        slide.setAttribute("aria-hidden", active ? "false" : "true");
+        dots[index].setAttribute("aria-selected", active ? "true" : "false");
+        dots[index].tabIndex = active ? 0 : -1;
+      });
+      const slide = heroSlides[heroIndex];
+      const kicker = slide.dataset.kicker || "SCREEN";
+      const title = slide.dataset.title || slide.querySelector("img")?.alt || "";
+      heroCounter.textContent = String(heroIndex + 1).padStart(2, "0") + " / " + String(total).padStart(2, "0");
+      heroTitle.textContent = title;
+      heroWindowLabel.textContent = "NOVAE · " + kicker;
+      if (userAction) scheduleHero();
+    }
+
+    goHero(0, false);
+    scheduleHero();
+    window.addEventListener("resize", () => goHero(heroIndex, false));
+
+    $("heroPrev").addEventListener("click", () => goHero(heroIndex - 1, true));
+    $("heroNext").addEventListener("click", () => goHero(heroIndex + 1, true));
+    heroCarousel.addEventListener("mouseenter", stopHero);
+    heroCarousel.addEventListener("mouseleave", scheduleHero);
+    heroCarousel.addEventListener("focusin", stopHero);
+    heroCarousel.addEventListener("focusout", scheduleHero);
+    heroCarousel.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") { event.preventDefault(); goHero(heroIndex - 1, true); }
+      if (event.key === "ArrowRight") { event.preventDefault(); goHero(heroIndex + 1, true); }
+    });
+
+    let heroStartX = null;
+    heroCarousel.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+      heroStartX = event.clientX;
+      stopHero();
+    });
+    heroCarousel.addEventListener("pointerup", (event) => {
+      if (heroStartX === null) return;
+      const delta = event.clientX - heroStartX;
+      heroStartX = null;
+      if (Math.abs(delta) > 46) goHero(heroIndex + (delta < 0 ? 1 : -1), true);
+      else scheduleHero();
+    });
+    heroCarousel.addEventListener("pointercancel", () => { heroStartX = null; scheduleHero(); });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopHero(); else scheduleHero();
+    });
+    reduceMotion.addEventListener?.("change", scheduleHero);
+  }
 
   $("navBurger").addEventListener("click", () => {
     const links = document.querySelector(".nav-links");
