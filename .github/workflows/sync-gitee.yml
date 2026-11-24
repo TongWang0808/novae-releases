@@ -1,18 +1,8 @@
 name: Sync to Gitee
 
+# 2026-11-24: 发版改为本机直推 GitHub / Gitee，并本地上传 Release 资产。
+# 自动 push / release / schedule 触发会走不稳定的国际链路，已停用；仅保留手动触发。
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - "v*"
-    paths:
-      - README.md
-  release:
-    types: [published]
-  schedule:
-    # Fallback polling in case a release event is missed.
-    - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
       tag:

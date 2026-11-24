@@ -1,8 +1,8 @@
 # Novae 第三方开源声明
 
-更新日期：2026-11-21
+更新日期：2026-11-24
 
-适用版本：Novae 1.3.6（Windows x64）
+适用版本：Novae 1.3.9（Windows x64）
 
 Novae 本体采用 MIT License，见仓库根目录 `LICENSE`。本文件列出 Novae 在产品中实际使用、参考或分发的第三方项目及许可证信息。
 
@@ -118,6 +118,9 @@ Node.js 本身采用 MIT 许可证；其完整许可证与第三方声明见 Nod
 | qqmusic-dl                      | MIT                                   | QQ CDN 文件前缀表交叉核对                                                  | 否，仅数据参考      | [https://github.com/menghuanshiguang/qqmusic-dl](https://github.com/menghuanshiguang/qqmusic-dl)                                 |
 | QQ\_music\_direct\_link\_export | GPL-3.0                               | QQ CDN 文件前缀表交叉核对                                                  | 否，仅数据参考      | [https://github.com/DreamWalkerXZ/QQ\_music\_direct\_link\_export](https://github.com/DreamWalkerXZ/QQ_music_direct_link_export) |
 | Supabase                        | Apache-2.0（开源部分）；托管服务按 Supabase 条款    | 匿名使用人数计数（PostgreSQL + PostgREST RPC），客户端仅通过 HTTPS 调用                  | 否，托管服务       | [https://supabase.com](https://supabase.com)                                                                                     |
+| SodaM                           | AGPL-3.0                              | 汽水音乐扫码、二次验证与 PC 签名流程参考；仅阅读公开实现，未复制代码                                     | 否，仅协议参考      | [https://github.com/sodahub-org/sodam](https://github.com/sodahub-org/sodam)                                                     |
+| mygo-music-qishui               | 未标注（公开源码）                         | 汽水音乐登录与播放链路参考；仅阅读公开实现，未复制代码                                          | 否，仅协议参考      | [https://github.com/DaviRain-Su/mygo-music-qishui](https://github.com/DaviRain-Su/mygo-music-qishui)                             |
+| bowen_music                     | 未标注（公开源码）                         | 波点音乐会员到期与最近播放协议参考；仅阅读公开实现，未复制代码                                      | 否，仅协议参考      | [https://github.com/ldm0715/bowen_music](https://github.com/ldm0715/bowen_music)                                                 |
 
 QQ CDN 前缀表用于以下档位映射：
 
@@ -147,6 +150,8 @@ hires  RS01 .flac        Hi-Res 无损（48kHz/24bit）
 | [github.com/wailsapp/wails/v2](https://github.com/wailsapp/wails/v2) v2.17.1                | MIT          | Go + WebView2 桌面框架            |
 | [github.com/wailsapp/go-webview2](https://github.com/wailsapp/go-webview2) v1.0.22          | MIT          | Wails 的 WebView2 绑定           |
 | [github.com/gorilla/websocket](https://github.com/gorilla/websocket) v1.5.3                 | BSD-2-Clause | Chrome DevTools Protocol 登录窗口 |
+| [github.com/skip2/go-qrcode](https://github.com/skip2/go-qrcode) v0.0.0-20200617195104-da1b6568686e | MIT          | 汽水 / 波点原生扫码二维码生成            |
+| [golang.org/x/crypto](https://golang.org/x/crypto) v0.57.0                                  | BSD-3-Clause | 汽水 CENC MP4 解密、密码学原语           |
 | [golang.org/x/image](https://golang.org/x/image) v0.41.0                                    | BSD-3-Clause | WebP 封面解码、取色                  |
 | [golang.org/x/sys](https://golang.org/x/sys) v0.48.0                                        | BSD-3-Clause | Windows 注册表、DPAPI、音频会话、托盘     |
 | [golang.org/x/text](https://golang.org/x/text) v0.42.0                                      | BSD-3-Clause | GBK 歌词解码                      |
@@ -161,6 +166,15 @@ hires  RS01 .flac        Hi-Res 无损（48kHz/24bit）
 | [github.com/leaanthony/go-ansi-parser](https://github.com/leaanthony/go-ansi-parser) v1.6.1 | MIT          | ANSI 解析                       |
 | [github.com/leaanthony/slicer](https://github.com/leaanthony/slicer) v1.6.0                 | MIT          | 切片工具                          |
 | [github.com/leaanthony/u](https://github.com/leaanthony/u) v1.1.1                           | MIT          | 可空类型                          |
+| [github.com/leaanthony/gosod](https://github.com/leaanthony/gosod) v1.0.4                   | MIT          | 模板渲染                          |
+| [github.com/godbus/dbus/v5](https://github.com/godbus/dbus/v5) v5.1.0                       | BSD-2-Clause | Linux / 桌面总线兼容                |
+| [github.com/jchv/go-winloader](https://github.com/jchv/go-winloader) v0.0.0-20210711035445-715c2860da7e | MIT          | Windows 原生库加载                   |
+| [github.com/labstack/echo/v4](https://github.com/labstack/echo/v4) v4.16.1                  | MIT          | Wails 内部 HTTP 服务                |
+| [github.com/labstack/gommon](https://github.com/labstack/gommon) v0.5.0                     | MIT          | Echo 通用工具                       |
+| [github.com/mattn/go-colorable](https://github.com/mattn/go-colorable) v0.1.15              | MIT          | 终端颜色输出                        |
+| [github.com/mattn/go-isatty](https://github.com/mattn/go-isatty) v0.0.22                    | MIT          | 终端检测                          |
+| [github.com/valyala/bytebufferpool](https://github.com/valyala/bytebufferpool) v1.0.0       | MIT          | 字节缓冲池                          |
+| [github.com/valyala/fasttemplate](https://github.com/valyala/fasttemplate) v1.2.2           | MIT          | 快速模板渲染                        |
 | [github.com/rivo/uniseg](https://github.com/rivo/uniseg) v0.4.7                             | MIT          | Unicode 文本分段                  |
 | [github.com/samber/lo](https://github.com/samber/lo) v1.49.1                                | MIT          | 泛型工具集                         |
 | [github.com/tkrajina/go-reflector](https://github.com/tkrajina/go-reflector) v0.5.8         | Apache-2.0   | 反射工具                          |
@@ -250,6 +264,10 @@ GitHub Actions 同步模板仅使用 `actions/checkout`（MIT），不属于应�
 * **QQ\_music\_direct\_link\_export（GPL-3.0）**：仅用于 CDN 前缀表交叉核对，未复制其代码。
 
 * **NeteaseCloudMusicApi**：GitHub 仓库已归档且当前无 LICENSE 文件；npm 包标注 MIT。后续维护优先使用 `api-enhanced`（MIT）。
+
+* **SodaM（AGPL-3.0）**：仅阅读其公开实现以核对汽水扫码、二次验证与 PC 签名流程，未复制其代码。SodaM 作为可选本机 signer 由用户自行安装，不随 Novae 分发；如后续引入其代码，需要按 AGPL-3.0 处理。
+
+* **mygo-music-qishui / bowen_music（未标注许可证）**：仅作为公开协议与交互参考，未复制代码，也未随包分发；许可证以各自仓库为准。
 
 * **Supabase**：匿名使用人数计数托管服务（PostgreSQL + PostgREST）；开源部分采用 Apache-2.0，托管服务按其服务条款使用。Novae 仅通过 HTTPS 调用部署在本项目的 REST RPC，不随包分发其代码。
 

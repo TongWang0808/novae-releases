@@ -1,689 +1,435 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Novae · 发现新声音 | 多平台桌面音乐播放器</title>
-<meta name="description" content="Novae 是一个为 Windows 打造的多平台桌面音乐播放器，支持华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐，多账号并存、沉浸歌词、玻璃主题与 GitHub / Gitee 双源更新。">
-<meta name="theme-color" content="#0a0a0d">
-<meta property="og:title" content="Novae · 发现新声音">
-<meta property="og:description" content="把五个音乐平台放进同一个桌面播放器。">
-<meta property="og:type" content="website">
-<meta property="og:image" content="assets/01-immersive-player.png">
-<link rel="icon" href="assets/appicon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Novae · 七个平台，一个播放器</title>
+<meta name="description" content="Novae 1.3.9 正式版：把 QQ 音乐、酷狗、酷我、网易云、华为音乐、汽水音乐与波点音乐放进同一个 Windows 播放器。">
+<meta name="theme-color" content="#f7faff">
 <style>
-  :root {
-    --bg: #08080b;
-    --bg-soft: #0d0d12;
-    --panel: rgba(22, 21, 27, 0.72);
-    --panel-2: rgba(255, 255, 255, 0.045);
-    --line: rgba(255, 255, 255, 0.10);
-    --line-strong: rgba(255, 255, 255, 0.18);
-    --text: #f8f5f7;
-    --dim: #b1aab4;
-    --faint: #77717c;
-    --pink: #ff7fa9;
-    --pink-2: #ffb08e;
-    --pink-soft: rgba(255, 127, 169, 0.13);
-    --good: #8de7c1;
-    --radius: 22px;
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  html, body { margin: 0; }
-  body {
-    color: var(--text);
-    background:
-      radial-gradient(1100px 620px at 12% -8%, rgba(255, 112, 166, 0.20), transparent 62%),
-      radial-gradient(820px 520px at 92% 4%, rgba(255, 176, 131, 0.13), transparent 60%),
-      radial-gradient(1000px 720px at 50% 112%, rgba(255, 95, 155, 0.10), transparent 66%),
-      var(--bg);
-    font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .34;
-    background-image:
-      linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
-    background-size: 84px 84px;
-    mask-image: linear-gradient(to bottom, #000, transparent 78%);
-  }
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    pointer-events: none;
-    opacity: .16;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-  }
-  a { color: inherit; text-decoration: none; }
-  button { font: inherit; }
-  img { max-width: 100%; display: block; }
-  .shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
-
-  /* nav */
-  .nav-wrap {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding: 16px 0;
-    transition: padding .25s ease;
-  }
-  .nav-wrap.scrolled { padding: 8px 0; }
-  .nav {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    min-height: 62px;
-    padding: 10px 12px 10px 14px;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: rgba(12,12,17,.64);
-    backdrop-filter: blur(26px) saturate(150%);
-    -webkit-backdrop-filter: blur(26px) saturate(150%);
-    box-shadow: 0 18px 55px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.08);
-  }
-  .brand { display: flex; align-items: center; gap: 11px; flex: none; }
-  .brand img {
-    width: 39px; height: 39px; border-radius: 11px;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 8px 24px rgba(255,110,165,.15);
-  }
-  .brand strong { font-size: 15px; letter-spacing: .15em; }
-  .brand span { display: block; margin-top: 2px; color: var(--faint); font-size: 10.5px; letter-spacing: .12em; }
-  .nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
-  .nav-links a {
-    padding: 9px 13px; border-radius: 10px; color: var(--dim); font-size: 13px;
-    transition: color .16s ease, background .16s ease;
-  }
-  .nav-links a:hover { color: #fff; background: rgba(255,255,255,.06); }
-  .nav-actions { display: flex; gap: 8px; flex: none; }
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    min-height: 40px; padding: 0 16px; border: 1px solid var(--line-strong);
-    border-radius: 11px; color: var(--text); background: rgba(255,255,255,.055);
-    font-size: 13px; cursor: pointer;
-    transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
-  }
-  .btn:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.27); transform: translateY(-1px); }
-  .btn:active { transform: scale(.96); }
-  .btn.primary {
-    color: #2b0714;
-    border-color: rgba(255, 174, 199, .72);
-    background: linear-gradient(135deg, #ffd5e2, #ffa3c0 55%, #ffb193);
-    box-shadow: 0 10px 32px rgba(255, 112, 166, .24), inset 0 1px 0 rgba(255,255,255,.62);
-    font-weight: 650;
-  }
-  .btn.primary:hover { background: linear-gradient(135deg, #ffe3ec, #ffb1c9 55%, #ffbea4); }
-  .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-burger { display: none; }
-
-  /* hero */
-  .hero { position: relative; padding: 80px 0 22px; }
-  .hero-grid { display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 58px; align-items: center; }
-  .eyebrow {
-    display: flex; align-items: center; gap: 10px; color: var(--pink-2);
-    font-size: 11px; letter-spacing: .20em; text-transform: uppercase;
-  }
-  .eyebrow::before { content: ""; width: 30px; height: 1px; background: linear-gradient(90deg, var(--pink), transparent); }
-  .hero h1 {
-    margin: 18px 0 17px;
-    font: 700 clamp(34px, 3.6vw, 52px)/1.16 "Georgia", "Noto Serif SC", "Songti SC", serif;
-    letter-spacing: -.035em;
-  }
-  .hero h1 span { display: block; white-space: nowrap; }
-  .hero h1 em {
-    font-style: normal;
-    background: linear-gradient(115deg, #fff 4%, #ffd7e2 42%, #ffa6bf 72%, #ffc19f 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .hero-sub { max-width: 480px; margin: 0; color: var(--dim); font-size: 15px; line-height: 1.9; }
-  .hero-sub b { color: #e7e0e5; font-weight: 600; }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 27px; }
-  .hero-actions .btn { min-height: 46px; padding: 0 20px; border-radius: 13px; }
-  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 18px; color: var(--faint); font-size: 11.5px; }
-  .hero-meta span { display: inline-flex; align-items: center; gap: 7px; }
-  .hero-meta i { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 10px var(--pink); }
-  .hero-stage { position: relative; min-width: 0; }
-  .hero-stage::before {
-    content: ""; position: absolute; inset: 4% -4% -8% 8%;
-    background: radial-gradient(60% 60% at 55% 40%, rgba(255,104,162,.30), transparent 70%);
-    filter: blur(34px); z-index: -1;
-  }
-  .window {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,.16);
-    border-radius: 24px;
-    background: linear-gradient(150deg, rgba(255,255,255,.06), rgba(255,255,255,.018));
-    box-shadow: 0 42px 110px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.16);
-  }
-  .window-bar {
-    height: 38px; display: flex; align-items: center; gap: 7px; padding: 0 14px;
-    border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(8,8,12,.48);
-  }
-  .window-bar i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.16); }
-  .window-bar i:nth-child(1) { background: #ff7f9f; }
-  .window-bar i:nth-child(2) { background: #ffbd8a; }
-  .window-bar i:nth-child(3) { background: #8ee0bd; }
-  .window-bar span { margin-left: 8px; color: var(--faint); font-size: 10px; letter-spacing: .10em; }
-  .hero-carousel {
-    position: relative; overflow: hidden; aspect-ratio: 1540 / 912;
-    background: #07070b; touch-action: pan-y;
-  }
-  .hero-track {
-    display: flex; height: 100%;
-    transition: transform .58s cubic-bezier(.22,.75,.24,1);
-  }
-  .hero-slide { position: relative; flex: 0 0 100%; height: 100%; margin: 0; }
-  .hero-slide img {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-    aspect-ratio: auto; user-select: none; -webkit-user-drag: none;
-  }
-  .hero-slide[aria-hidden="true"] { pointer-events: none; }
-  .hero-carousel::after {
-    content: ""; position: absolute; inset: auto 0 0; height: 120px; z-index: 2;
-    background: linear-gradient(180deg, transparent, rgba(5,5,8,.72));
-    pointer-events: none;
-  }
-  .hero-arrow {
-    position: absolute; top: 50%; z-index: 6; display: grid; place-items: center;
-    width: 42px; height: 42px; margin-top: -21px; padding: 0;
-    border: 1px solid rgba(255,255,255,.20); border-radius: 50%;
-    background: rgba(9,9,14,.58); color: #fff; cursor: pointer;
-    backdrop-filter: blur(14px);
-    transition: background .2s ease, border-color .2s ease, transform .2s ease;
-  }
-  .hero-arrow:hover, .hero-arrow:focus-visible {
-    background: rgba(255,143,177,.72); border-color: rgba(255,255,255,.55); transform: scale(1.06);
-    outline: none;
-  }
-  .hero-arrow.prev { left: 16px; }
-  .hero-arrow.next { right: 16px; }
-  .hero-arrow svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .hero-caption {
-    position: absolute; left: 20px; bottom: 18px; z-index: 5;
-    display: flex; flex-direction: column; gap: 5px; max-width: 62%;
-    pointer-events: none; text-shadow: 0 2px 18px rgba(0,0,0,.7);
-  }
-  .hero-counter { color: rgba(255,196,216,.9); font-size: 10px; letter-spacing: .16em; font-variant-numeric: tabular-nums; }
-  .hero-caption strong { color: #fff; font-size: 14px; font-weight: 600; line-height: 1.35; letter-spacing: .01em; }
-  .hero-dots {
-    position: absolute; left: 50%; bottom: 18px; z-index: 6; transform: translateX(-50%);
-    display: flex; align-items: center; gap: 5px; padding: 6px 9px;
-    border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
-    background: rgba(8,8,13,.48); backdrop-filter: blur(12px);
-  }
-  .hero-dot {
-    width: 6px; height: 6px; padding: 0; border: 0; border-radius: 999px;
-    background: rgba(255,255,255,.34); cursor: pointer;
-    transition: width .2s ease, background .2s ease;
-  }
-  .hero-dot[aria-selected="true"] { width: 18px; background: var(--pink-2); }
-  .hero-dot:focus-visible { outline: 1px solid rgba(255,255,255,.8); outline-offset: 3px; }
-  .hero-badge {
-    position: absolute; right: -8px; bottom: 24px;
-    display: flex; align-items: center; gap: 9px;
-    padding: 10px 13px; border: 1px solid rgba(141,231,193,.24);
-    border-radius: 12px; background: rgba(10,18,16,.72); color: var(--good);
-    font-size: 11px; backdrop-filter: blur(16px);
-    box-shadow: 0 12px 36px rgba(0,0,0,.4);
-  }
-  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 12px var(--good); animation: breathe 2.2s ease-in-out infinite; }
-  @keyframes breathe { 50% { opacity: .38; transform: scale(.82); } }
-
-  /* stats */
-  .stats { padding: 58px 0 12px; }
-  .stats-card {
-    display: grid; grid-template-columns: 1.26fr repeat(3, minmax(0, .82fr));
-    border: 1px solid var(--line); border-radius: var(--radius);
-    background: linear-gradient(150deg, rgba(255,255,255,.055), rgba(255,255,255,.018) 50%);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 20px 60px rgba(0,0,0,.24);
-    overflow: hidden;
-  }
-  .stat { position: relative; padding: 25px 25px 23px; min-width: 0; }
-  .stat + .stat { border-left: 1px solid rgba(255,255,255,.08); }
-  .stat .label { display: flex; align-items: center; gap: 7px; color: var(--faint); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; }
-  .stat .label i { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); }
-  .stat .value { margin-top: 12px; font: 700 clamp(27px, 3.1vw, 40px)/1.05 "Georgia", serif; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
-  .stat .value small { margin-left: 5px; color: var(--dim); font: 500 11px/1.4 "HarmonyOS Sans SC", "PingFang SC", sans-serif; letter-spacing: 0; }
-  .stat .note { margin-top: 8px; color: var(--faint); font-size: 10.5px; line-height: 1.6; }
-  .stat.usage .value { color: #ffd8e4; text-shadow: 0 0 38px rgba(255,112,166,.22); }
-  .stat.usage .label .live-dot { width: 6px; height: 6px; }
-  .stat .split { display: flex; gap: 16px; margin-top: 8px; color: var(--dim); font-size: 11px; }
-  .stat .split b { color: #e8e1e6; font-weight: 600; font-variant-numeric: tabular-nums; }
-
-  /* section base */
-  .section { padding: 94px 0 0; }
-  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; margin-bottom: 32px; }
-  .section-kicker { color: var(--pink-2); font-size: 10.5px; letter-spacing: .20em; text-transform: uppercase; }
-  .section h2 { margin: 10px 0 0; font: 700 clamp(28px, 3.6vw, 42px)/1.14 "Georgia", "Noto Serif SC", serif; letter-spacing: -.025em; }
-  .section-lead { max-width: 430px; margin: 0; color: var(--dim); font-size: 13px; line-height: 1.85; }
-
-  /* features */
-  .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .feature {
-    position: relative; overflow: hidden; min-height: 235px; padding: 26px;
-    border: 1px solid var(--line); border-radius: 19px;
-    background: linear-gradient(155deg, rgba(255,255,255,.052), rgba(255,255,255,.016));
-    transition: transform .22s ease, border-color .22s ease, background .22s ease;
-  }
-  .feature:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.20); background: linear-gradient(155deg, rgba(255,255,255,.075), rgba(255,255,255,.025)); }
-  .feature .icon {
-    display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,.12); background: rgba(255,143,177,.10); color: #ffb3cb;
-  }
-  .feature .icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-  .feature h3 { margin: 19px 0 9px; font-size: 16px; font-weight: 650; letter-spacing: .01em; }
-  .feature p { margin: 0; color: var(--dim); font-size: 12.5px; line-height: 1.8; }
-  .feature .tag { display: inline-block; margin-top: 17px; padding: 5px 9px; border-radius: 7px; color: var(--faint); background: rgba(255,255,255,.045); font-size: 10px; letter-spacing: .06em; }
-  .feature.wide { grid-column: span 2; }
-  .feature.full { grid-column: span 3; }
-  .feature.wide p, .feature.full p { max-width: 520px; }
-  .feature.wide::after, .feature.full::after {
-    content: ""; position: absolute; width: 240px; height: 240px; right: -70px; bottom: -90px;
-    background: radial-gradient(circle, rgba(255,112,166,.20), transparent 68%);
-  }
-
-  /* screenshots */
-  .gallery { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
-  .shot {
-    position: relative; grid-column: span 6; overflow: hidden; padding: 0;
-    border: 1px solid var(--line); border-radius: 17px;
-    background: rgba(255,255,255,.025); cursor: zoom-in; text-align: left;
-    transition: transform .24s ease, border-color .24s ease;
-  }
-  .shot.big { grid-column: span 12; }
-  .shot.third { grid-column: span 4; }
-  .shot:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.24); }
-  .shot img { width: 100%; aspect-ratio: 16/10; object-fit: cover; transition: transform .35s ease; }
-  .shot.big img { aspect-ratio: 1540/912; }
-  .shot:hover img { transform: scale(1.018); }
-  .shot figcaption {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 13px 15px 14px; color: #ded7dd; font-size: 12px;
-    background: rgba(9,9,13,.42); border-top: 1px solid rgba(255,255,255,.06);
-  }
-  .shot figcaption span { color: var(--faint); font-size: 10px; letter-spacing: .08em; }
-  .gallery-note { margin-top: 14px; color: var(--faint); font-size: 11px; }
-
-  /* download */
-  .download { padding: 96px 0 0; }
-  .download-card {
-    position: relative; overflow: hidden;
-    display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr); gap: 40px;
-    padding: 44px; border: 1px solid rgba(255,255,255,.15); border-radius: 28px;
-    background:
-      radial-gradient(560px 300px at 92% -10%, rgba(255,123,172,.18), transparent 65%),
-      linear-gradient(150deg, rgba(255,255,255,.085), rgba(255,255,255,.022) 48%);
-    box-shadow: 0 38px 100px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.15);
-  }
-  .download-icon { width: 58px; height: 58px; border-radius: 16px; box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 14px 38px rgba(255,112,166,.18); }
-  .download h2 { margin: 18px 0 10px; font: 700 clamp(26px, 3.2vw, 38px)/1.12 "Georgia", serif; letter-spacing: -.025em; }
-  .download p { max-width: 520px; margin: 0; color: var(--dim); font-size: 13px; line-height: 1.85; }
-  .download .hero-actions { margin-top: 22px; }
-  .release-box { align-self: center; padding: 22px; border: 1px solid rgba(255,255,255,.11); border-radius: 16px; background: rgba(8,8,12,.32); }
-  .release-row { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
-  .release-row:first-child { padding-top: 0; }
-  .release-row:last-child { padding-bottom: 0; border-bottom: none; }
-  .release-row span { color: var(--faint); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
-  .release-row b { color: #e9e2e7; font-size: 12px; font-weight: 600; text-align: right; }
-  .release-row code { color: #d9d2d8; font: 10.5px/1.5 "Cascadia Mono", "SFMono-Regular", Consolas, monospace; word-break: break-all; text-align: right; }
-  .release-note { margin-top: 16px; color: var(--faint); font-size: 10.5px; line-height: 1.75; }
-  .platforms { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-  .platforms span { padding: 7px 10px; border: 1px solid rgba(255,255,255,.09); border-radius: 8px; color: #bdb5bf; background: rgba(255,255,255,.035); font-size: 10.5px; }
-
-  /* footer */
-  footer { margin-top: 72px; border-top: 1px solid rgba(255,255,255,.07); padding: 26px 0 38px; }
-  .footer-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 36px; color: var(--faint); font-size: 11px; line-height: 1.8; }
-  .footer-left { display: flex; align-items: center; gap: 11px; }
-  .footer-left img { width: 30px; height: 30px; border-radius: 8px; }
-  .footer-left b { display: block; color: #d8d1d7; font-size: 12px; letter-spacing: .12em; }
-  .footer-links { display: flex; flex-wrap: wrap; gap: 7px 18px; justify-content: flex-end; }
-  .footer-links a { color: #aaa2ac; }
-  .footer-links a:hover { color: #fff; }
-  .disclaimer { max-width: 640px; margin-top: 16px; color: #625c67; font-size: 10px; line-height: 1.75; }
-
-  /* lightbox */
-  .lightbox {
-    position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
-    padding: 30px; background: rgba(4,4,7,.82); backdrop-filter: blur(18px);
-    opacity: 0; pointer-events: none; transition: opacity .2s ease;
-  }
-  .lightbox.open { opacity: 1; pointer-events: auto; }
-  .lightbox img { max-width: min(1320px, 96vw); max-height: 86vh; border: 1px solid rgba(255,255,255,.18); border-radius: 16px; box-shadow: 0 40px 120px rgba(0,0,0,.7); }
-  .lightbox-close { position: absolute; top: 22px; right: 24px; width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07); color: #fff; cursor: pointer; font-size: 20px; }
-
-  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1); }
-  .reveal.in { opacity: 1; transform: none; }
-
-  @media (max-width: 980px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-    .hero { padding-top: 58px; }
-    .hero-sub { max-width: 620px; }
-    .hero-stage { max-width: 820px; }
-    .stats-card { grid-template-columns: 1fr 1fr; }
-    .stat + .stat { border-left: none; border-top: 1px solid rgba(255,255,255,.08); }
-    .stat:nth-child(even) { border-left: 1px solid rgba(255,255,255,.08); }
-    .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .feature.wide, .feature.full { grid-column: span 2; }
-    .download-card { grid-template-columns: 1fr; gap: 28px; padding: 32px; }
-  }
-  @media (max-width: 760px) {
-    .shell { width: calc(100% - 28px); }
-    .nav { gap: 10px; }
-    .nav-links { display: none; }
-    .nav-actions .btn.ghost { display: none; }
-    .nav-burger {
-      display: grid; place-items: center; width: 38px; height: 38px; margin-left: auto;
-      border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.05); color: #fff; cursor: pointer;
-    }
-    .hero h1 { font-size: clamp(36px, 10vw, 52px); }
-    .section { padding-top: 72px; }
-    .section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
-    .features { grid-template-columns: 1fr; }
-    .feature.wide, .feature.full { grid-column: span 1; }
-    .gallery { grid-template-columns: 1fr; }
-    .shot, .shot.big, .shot.third { grid-column: span 1; }
-    .hero-arrow { width: 34px; height: 34px; margin-top: -17px; }
-    .hero-arrow.prev { left: 9px; }
-    .hero-arrow.next { right: 9px; }
-    .hero-caption { left: 12px; bottom: 44px; max-width: calc(100% - 120px); }
-    .hero-caption strong { font-size: 12.5px; }
-    .hero-dots { bottom: 12px; padding: 5px 7px; }
-    .stat { padding: 20px; }
-    .stat .value { font-size: 32px; }
-    .download-card { padding: 26px 21px; }
-    .footer-row { flex-direction: column; gap: 16px; }
-    .footer-links { justify-content: flex-start; }
-    .hero-badge { right: 8px; bottom: 14px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
-  }
+:root{
+  --ink:#0b1424;
+  --ink-2:#24324a;
+  --muted:#64748b;
+  --canvas:#f7faff;
+  --card:rgba(255,255,255,.78);
+  --line:rgba(15,23,42,.09);
+  --line-strong:rgba(15,23,42,.16);
+  --blue:#2f6fed;
+  --blue-2:#5793ff;
+  --cyan:#14c8e5;
+  --violet:#8b5cf6;
+  --peach:#ffb27a;
+  --mint:#3dd6ae;
+  --shadow:0 20px 60px rgba(38,70,130,.12);
+  --shadow-sm:0 10px 30px rgba(38,70,130,.08);
+  --radius:24px;
+  --max:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background:
+    radial-gradient(1000px 700px at 12% -8%, rgba(87,147,255,.20), transparent 60%),
+    radial-gradient(900px 700px at 92% 4%, rgba(20,200,229,.16), transparent 62%),
+    radial-gradient(900px 800px at 50% 108%, rgba(139,92,246,.12), transparent 65%),
+    var(--canvas);
+  font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:16px;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font:inherit}
+::selection{background:rgba(47,111,237,.18)}
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:-2;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(10px);opacity:.6;animation:float 16s ease-in-out infinite alternate}
+.orb.a{width:420px;height:420px;left:-180px;top:10%;background:linear-gradient(135deg,rgba(87,147,255,.5),rgba(20,200,229,.12))}
+.orb.b{width:340px;height:340px;right:-120px;top:18%;background:linear-gradient(135deg,rgba(255,178,122,.55),rgba(139,92,246,.18));animation-delay:-6s}
+.orb.c{width:520px;height:520px;left:38%;bottom:-330px;background:linear-gradient(135deg,rgba(61,214,174,.25),rgba(139,92,246,.25));animation-delay:-11s}
+.grid-fade{position:fixed;inset:0;pointer-events:none;z-index:-1;background:linear-gradient(rgba(15,23,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(15,23,42,.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(circle at 50% 30%,#000 0%,transparent 75%)}
+@keyframes float{to{transform:translate3d(40px,-30px,0) scale(1.06)}}
+.wrap{width:min(var(--max),calc(100% - 40px));margin:0 auto}
+.nav{position:sticky;top:0;z-index:50;padding:14px 0;transition:.25s}
+.nav.scrolled{padding:8px 0;background:rgba(247,250,255,.72);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;gap:18px;padding:10px 16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.62);backdrop-filter:blur(18px) saturate(150%);box-shadow:0 8px 30px rgba(38,70,130,.06)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em}
+.logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:900;background:conic-gradient(from 160deg,var(--blue),var(--cyan),var(--violet),var(--blue));box-shadow:0 8px 22px rgba(47,111,237,.35)}
+.brand small{display:block;font-size:10px;letter-spacing:.2em;color:var(--muted);font-weight:700;margin-top:-5px}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{padding:8px 12px;border-radius:10px;color:var(--muted);font-size:14px;font-weight:600;transition:.2s}
+.nav-links a:hover{color:var(--ink);background:rgba(15,23,42,.05)}
+.nav-cta{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;background:var(--ink);color:#fff;font-size:13px;font-weight:700;transition:.2s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,.18)}
+.nav-cta svg{width:15px;height:15px}
+.hero{padding:88px 0 44px;display:grid;grid-template-columns:1.02fr .98fr;gap:44px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid rgba(47,111,237,.22);border-radius:999px;background:rgba(255,255,255,.6);color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.04em;box-shadow:0 6px 18px rgba(47,111,237,.08)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 5px rgba(61,214,174,.16);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(61,214,174,.04)}}
+h1{font-size:clamp(46px,5.4vw,72px);line-height:1.05;letter-spacing:-.055em;margin:22px 0 20px;font-weight:900}
+h1 em{font-style:normal;background:linear-gradient(110deg,var(--blue) 2%,var(--cyan) 42%,var(--violet) 96%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{max-width:620px;color:var(--muted);font-size:17px;line-height:1.85;margin:0 0 26px}
+.hero-sub b{color:var(--ink-2)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 20px;border-radius:14px;font-weight:800;font-size:14px;border:1px solid transparent;transition:.24s;white-space:nowrap;cursor:pointer}
+.btn.primary{color:#fff;background:linear-gradient(135deg,var(--blue),#5b8cff 55%,var(--cyan));box-shadow:0 14px 30px rgba(47,111,237,.28)}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(47,111,237,.34)}
+.btn.ghost{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
+.btn.ghost:hover{transform:translateY(-2px);background:#fff;box-shadow:var(--shadow-sm)}
+.btn svg{width:17px;height:17px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:18px;color:var(--muted);font-size:12px;font-weight:600}
+.hero-meta code{padding:3px 7px;border-radius:7px;background:rgba(15,23,42,.055);font-size:11px;color:var(--ink-2)}
+.hero-visual{position:relative;perspective:1200px}
+.shot{position:relative;border-radius:26px;overflow:hidden;border:1px solid rgba(255,255,255,.8);box-shadow:0 32px 90px rgba(38,70,130,.22),0 0 0 1px rgba(15,23,42,.06);transform:rotateY(-4deg) rotateX(2deg);background:#0e1320}
+.shot img{width:100%;height:auto;display:block}
+.shot::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.18),transparent 28%,transparent 72%,rgba(20,200,229,.08));pointer-events:none}
+.float-chip{position:absolute;display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:13px;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);box-shadow:0 14px 34px rgba(38,70,130,.16);backdrop-filter:blur(16px);font-size:12px;font-weight:800;color:var(--ink-2);animation:bob 6s ease-in-out infinite}
+.float-chip.one{right:-14px;top:22px}
+.float-chip.two{left:-16px;bottom:30px;animation-delay:-3s}
+.float-chip i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 5px rgba(20,200,229,.14)}
+@keyframes bob{50%{transform:translateY(-9px)}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:16px 0 8px}
+.stat{padding:18px 18px 16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.58);backdrop-filter:blur(14px);box-shadow:var(--shadow-sm)}
+.stat b{display:block;font-size:27px;line-height:1;letter-spacing:-.04em}
+.stat span{display:block;margin-top:7px;color:var(--muted);font-size:12px;font-weight:600}
+.section{padding:76px 0 18px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:28px}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.kicker:before{content:"";width:18px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+h2{font-size:clamp(30px,3.6vw,44px);line-height:1.15;letter-spacing:-.045em;margin:10px 0 0;font-weight:900}
+.section-head p{max-width:390px;color:var(--muted);font-size:14px;margin:0}
+.features{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.feature{position:relative;overflow:hidden;padding:28px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);backdrop-filter:blur(18px);box-shadow:var(--shadow-sm);transition:.28s}
+.feature:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(47,111,237,.18)}
+.feature:before{content:"";position:absolute;width:120px;height:120px;right:-45px;top:-45px;border-radius:50%;background:radial-gradient(circle,rgba(87,147,255,.22),transparent 70%)}
+.feature .icon{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(47,111,237,.12),rgba(20,200,229,.12));color:var(--blue);font-size:20px;font-weight:900;margin-bottom:18px}
+.feature h3{font-size:20px;letter-spacing:-.03em;margin:0 0 8px}
+.feature p{color:var(--muted);font-size:14px;line-height:1.8;margin:0}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.tag{padding:5px 9px;border-radius:8px;background:rgba(15,23,42,.05);color:var(--ink-2);font-size:11px;font-weight:700}
+.gallery{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.gcard{grid-column:span 6;position:relative;margin:0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#dbe6f5;box-shadow:var(--shadow-sm);cursor:zoom-in;transition:.28s;min-height:190px}
+.gcard:nth-child(5),.gcard:nth-child(8){grid-column:span 12}
+.gcard:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(47,111,237,.2)}
+.gcard img{width:100%;height:100%;object-fit:cover;aspect-ratio:16/10;transition:.4s}
+.gcard:hover img{transform:scale(1.025)}
+.gcap{position:absolute;left:14px;right:14px;bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-radius:12px;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 22px rgba(15,23,42,.12)}
+.gcap b{font-size:12px;letter-spacing:-.01em;color:var(--ink)}
+.gcap span{font-size:10px;font-weight:800;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.platforms{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.platform{padding:15px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.64);text-align:center;transition:.25s}
+.platform:hover{transform:translateY(-3px);background:#fff;box-shadow:var(--shadow-sm)}
+.platform b{display:block;font-size:13px;letter-spacing:-.02em}
+.platform span{display:block;margin-top:4px;font-size:10px;color:var(--muted);font-weight:700}
+.update{display:grid;grid-template-columns:.9fr 1.1fr;gap:30px;align-items:start;padding:36px;border-radius:30px;border:1px solid rgba(47,111,237,.16);background:linear-gradient(135deg,rgba(255,255,255,.86),rgba(239,246,255,.72));box-shadow:var(--shadow)}
+.update .ver{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border-radius:999px;background:rgba(47,111,237,.1);color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.06em}
+.update h2{margin-top:12px}
+.update p{color:var(--muted);font-size:14px;margin:12px 0 20px}
+.update-list{display:grid;gap:10px}
+.update-item{display:flex;gap:11px;padding:13px 14px;border-radius:13px;background:rgba(255,255,255,.62);border:1px solid var(--line)}
+.update-item i{flex:0 0 7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));margin-top:7px}
+.update-item span{font-size:13px;color:var(--ink-2);line-height:1.65}
+.download{padding:44px;border-radius:32px;border:1px solid rgba(255,255,255,.9);background:
+  radial-gradient(600px 300px at 8% 10%,rgba(87,147,255,.22),transparent 60%),
+  radial-gradient(500px 300px at 92% 90%,rgba(20,200,229,.18),transparent 62%),
+  rgba(255,255,255,.78);
+  box-shadow:var(--shadow);display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;backdrop-filter:blur(18px)}
+.download h2{max-width:560px}
+.download p{color:var(--muted);font-size:14px;margin:12px 0 24px}
+.dl-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}
+.meta-box{padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.66);border:1px solid var(--line)}
+.meta-box span{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+.meta-box b{display:block;margin-top:3px;font-size:12px;word-break:break-all}
+.install{padding:22px;border-radius:18px;background:rgba(255,255,255,.66);border:1px solid var(--line)}
+.install h3{font-size:16px;margin:0 0 12px}
+.install ol{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:2}
+.install code{font-size:11px}
+.install a{color:var(--blue);font-weight:700}
+.footer{padding:54px 0 34px}
+.footer-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:30px;padding-top:26px;border-top:1px solid var(--line)}
+.footer p{color:var(--muted);font-size:12px;line-height:1.9;margin:10px 0 0;max-width:740px}
+.footer-links{display:flex;flex-wrap:wrap;gap:8px 16px;align-content:start}
+.footer-links a{font-size:12px;color:var(--ink-2);font-weight:700;border-bottom:1px solid transparent}
+.footer-links a:hover{color:var(--blue);border-color:rgba(47,111,237,.3)}
+.reveal{opacity:1;transform:none}
+.reveal.in{opacity:1;transform:none}
+.lightbox{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:24px;background:rgba(8,18,35,.72);backdrop-filter:blur(18px)}
+.lightbox.open{display:grid}
+.lightbox img{max-width:min(1200px,92vw);max-height:86vh;width:auto;border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.lightbox button{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.12);color:#fff;font-size:21px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,18px);opacity:0;pointer-events:none;padding:10px 14px;border-radius:11px;background:rgba(15,23,42,.9);color:#fff;font-size:12px;font-weight:700;transition:.25s;z-index:120}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:980px){
+  .hero{grid-template-columns:1fr;gap:34px;padding-top:60px}
+  .hero-sub{max-width:100%}
+  .hero-visual{max-width:680px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .section-head{display:block}
+  .section-head p{margin-top:10px}
+  .platforms{grid-template-columns:repeat(4,1fr)}
+  .update,.download{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .wrap{width:calc(100% - 24px)}
+  .nav-links{display:none}
+  .nav-inner{padding:8px 10px}
+  .hero{padding-top:44px}
+  h1{font-size:40px}
+  .hero-sub{font-size:15px}
+  .btn{width:100%}
+  .hero-meta{font-size:11px}
+  .features{grid-template-columns:1fr}
+  .gallery{grid-template-columns:1fr}
+  .gcard,.gcard:nth-child(5),.gcard:nth-child(8){grid-column:span 1}
+  .gcard img{aspect-ratio:16/10}
+  .platforms{grid-template-columns:repeat(2,1fr)}
+  .download{padding:24px}
+  .section{padding-top:56px}
+  .footer-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
-<div class="shell nav-wrap" id="navWrap">
-  <nav class="nav" aria-label="主导航">
+<div class="ambient" aria-hidden="true"><i class="orb a"></i><i class="orb b"></i><i class="orb c"></i></div>
+<div class="grid-fade" aria-hidden="true"></div>
+
+<nav class="nav" id="nav">
+  <div class="wrap nav-inner">
     <a class="brand" href="#top" aria-label="Novae 首页">
-      <img src="assets/appicon.png" alt="Novae 应用图标">
-      <div><strong>NOVAE</strong><span>发现新声音</span></div>
+      <span class="logo">N</span>
+      <span>Novae<small>DESKTOP MUSIC</small></span>
     </a>
     <div class="nav-links">
-      <a href="#features">功能</a>
+      <a href="#features">特性</a>
       <a href="#gallery">界面</a>
-      <a href="#stats">数据</a>
+      <a href="#platforms">平台</a>
       <a href="#download">下载</a>
+      <a href="usage.html">使用指南</a>
     </div>
-    <div class="nav-actions">
-      <a class="btn ghost" href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn primary" href="https://github.com/TongWang0808/novae-releases/releases/latest" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-        下载
-      </a>
-    </div>
-    <button class="nav-burger" id="navBurger" type="button" aria-label="打开导航">☰</button>
-  </nav>
-</div>
+    <a class="nav-cta" href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub ↗</a>
+  </div>
+</nav>
 
-<header class="shell hero" id="top">
-  <div class="hero-grid">
-    <div>
-      <div class="eyebrow">Windows 10 / 11 · x64</div>
-      <h1><span>把五个音乐平台，</span><span><em>放进同一个播放器。</em></span></h1>
-      <p class="hero-sub">Novae 是用 <b>Wails（Go + WebView2）</b> 打造的桌面音乐客户端。华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐可以同时登录、随时切换；也可以不登录平台，只接一个自建或公开的云端音源。</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="https://github.com/TongWang0808/novae-releases/releases/latest" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-          从 GitHub 下载
+<main id="top">
+  <section class="wrap hero">
+    <div class="hero-copy reveal">
+      <div class="eyebrow"><span class="dot"></span> NOVAE 1.3.9 · 正式版已发布</div>
+      <h1>七个平台，<br><em>一个播放器。</em></h1>
+      <p class="hero-sub">QQ 音乐、酷狗、酷我、网易云、华为音乐、<b>汽水音乐</b>与<b>波点音乐</b>，同时登录、随时切换。也可以不登录平台，只接一个自建或公开的云端音源。</p>
+      <div class="cta">
+        <a class="btn primary" id="downloadPrimary" href="https://github.com/TongWang0808/novae-releases/releases/download/v1.3.9/novae.exe" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+          下载 Windows 版
         </a>
-        <a class="btn" href="https://gitee.com/meiliwang0808/novae-releases/releases/latest" target="_blank" rel="noopener">Gitee 下载</a>
-        <a class="btn" href="#gallery">先看界面</a>
+        <a class="btn ghost" href="https://gitee.com/meiliwang0808/novae-releases/releases/latest" target="_blank" rel="noopener">Gitee 镜像</a>
       </div>
       <div class="hero-meta">
-        <span><i></i>免安装，下载即用</span>
-        <span><i></i>12 套主题</span>
-        <span><i></i>GitHub / Gitee 双源更新</span>
+        <span>Windows 10 / 11 · x64</span>
+        <span>·</span>
+        <span id="sizeText">53.4 MB</span>
+        <span>·</span>
+        <span>SHA-256 <code id="shaShort">A1E54396…8452F</code></span>
       </div>
     </div>
-    <div class="hero-stage reveal">
-      <div class="window">
-        <div class="window-bar"><i></i><i></i><i></i><span id="heroWindowLabel">NOVAE · IMMERSIVE PLAYER</span></div>
-        <div class="hero-carousel" id="heroCarousel" role="region" aria-roledescription="carousel" aria-label="Novae 界面截图轮播">
-          <div class="hero-track" id="heroTrack">
-            <figure class="hero-slide" data-kicker="IMMERSIVE PLAYER" data-title="沉浸播放与逐行歌词">
-              <img src="assets/01-immersive-player.png" alt="Novae 沉浸播放与逐行歌词" loading="eager" decoding="async">
-            </figure>
-            <figure class="hero-slide" data-kicker="RECOMMEND" data-title="推荐首页与每日专辑">
-              <img src="assets/13-recommend.png" alt="Novae 推荐首页与每日专辑" loading="eager" decoding="async">
-            </figure>
-            <figure class="hero-slide" data-kicker="SEARCH" data-title="歌手 / 专辑 / 歌曲三级搜索">
-              <img src="assets/14-search.png" alt="Novae 三级搜索结果" loading="eager" decoding="async">
-            </figure>
-            <figure class="hero-slide" data-kicker="HISTORY" data-title="跨平台最近播放">
-              <img src="assets/15-history-sync.png" alt="Novae 跨平台最近播放" loading="eager" decoding="async">
-            </figure>
-            <figure class="hero-slide" data-kicker="THEMES" data-title="12 套主题与玻璃表面">
-              <img src="assets/03-themes.png" alt="Novae 12 套主题与玻璃表面" loading="eager" decoding="async">
-            </figure>
-            <figure class="hero-slide" data-kicker="DOWNLOADS" data-title="批量下载与音质校验">
-              <img src="assets/16-downloads.png" alt="Novae 批量下载与音质校验" loading="eager" decoding="async">
-            </figure>
-          </div>
-          <button class="hero-arrow prev" id="heroPrev" type="button" aria-label="上一张截图">
-            <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
-          </button>
-          <button class="hero-arrow next" id="heroNext" type="button" aria-label="下一张截图">
-            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
-          </button>
-          <div class="hero-caption">
-            <span class="hero-counter" id="heroCounter" aria-live="polite">01 / 06</span>
-            <strong id="heroTitle">沉浸播放与逐行歌词</strong>
-          </div>
-          <div class="hero-dots" id="heroDots" role="tablist" aria-label="截图分页"></div>
-        </div>
-      </div>
-      <div class="hero-badge"><span class="live-dot"></span><span id="heroUsage">LIVE · 正在读取使用人数</span></div>
+    <div class="hero-visual reveal">
+      <figure class="shot" style="margin:0">
+        <img src="docs/readme-1.3.9/01-recommend.png" alt="Novae 推荐页与音乐盲盒" width="1280" height="800" fetchpriority="high">
+      </figure>
+      <div class="float-chip one"><i></i> 7 个平台 · 同时在线</div>
+      <div class="float-chip two"><i></i> 5 行队列 · 右侧滚动</div>
     </div>
-  </div>
-</header>
+  </section>
 
-<section class="shell stats" id="stats" aria-label="Novae 实时数据">
-  <div class="stats-card reveal">
-    <div class="stat usage">
-      <div class="label"><i class="live-dot"></i>匿名使用设备</div>
-      <div class="value"><span id="usageCount">--</span><small>台</small></div>
-      <div class="note" id="usageNote">正在连接 Supabase 实时计数…</div>
-    </div>
-    <div class="stat">
-      <div class="label">仓库累计访问</div>
-      <div class="value"><span id="repoViews">--</span><small>次</small></div>
-      <div class="split"><span>GitHub <b id="ghViews">--</b></span><span>Gitee <b id="giteeViews">--</b></span></div>
-      <div class="note" id="repoNote">GitHub + Gitee 项目页累计打开次数</div>
-    </div>
-    <div class="stat">
-      <div class="label">GitHub 仓库</div>
-      <div class="value"><span id="starCount">2</span><small>Stars</small></div>
-      <div class="split"><span>Forks <b id="forkCount">0</b></span><span>MIT License</span></div>
-    </div>
-    <div class="stat">
-      <div class="label">当前版本</div>
-      <div class="value">v<span id="versionText">1.3.8</span></div>
-      <div class="note" id="versionNote">Windows 10 / 11 · x64</div>
-    </div>
-  </div>
-</section>
+  <section class="wrap stats reveal" aria-label="Novae 实时数据">
+    <div class="stat"><b id="usageCount">—</b><span>台设备使用过</span></div>
+    <div class="stat"><b id="viewCount">—</b><span>项目页累计访问</span></div>
+    <div class="stat"><b>7</b><span>个音乐平台</span></div>
+    <div class="stat"><b>5</b><span>行队列可视区</span></div>
+  </section>
 
-<section class="shell section" id="features">
-  <div class="section-head reveal">
-    <div>
-      <div class="section-kicker">FEATURES</div>
-      <h2>不是换皮网页，<br>是一台真正能用的播放器。</h2>
-    </div>
-    <p class="section-lead">多平台账号、跨平台最近播放、逐行歌词、玻璃主题与按压反馈，都在同一个原生桌面窗口里完成。</p>
-  </div>
-  <div class="features">
-    <article class="feature wide reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.4 4 5.7 4 9s-1.5 6.6-4 9c-2.5-2.4-4-5.7-4-9s1.5-6.6 4-9z"/></svg></div>
-      <h3>五个平台，一个窗口</h3>
-      <p>华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐可以同时登录、随时切换。平台账号与自建 API 都能设为默认音源，平台只给试听片段时还能用辅助音源补全。</p>
-      <span class="tag">多账号并存 · 平台 / API 混合音源</span>
-    </article>
-    <article class="feature reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 18V9M9 18V6M14 18v-4M19 18V4"/></svg></div>
-      <h3>最近播放，跟着账号走</h3>
-      <p>从各平台官方客户端同步最近播放，切换账号后自动拉取；我喜欢的音乐、平台歌单、下载与本地音乐都在同一层页面里。</p>
-      <span class="tag">跨平台历史 · 实时刷新</span>
-    </article>
-    <article class="feature reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 15V9a7 7 0 0114 0v6"/><path d="M18 15a2 2 0 01-2 2h-2"/><path d="M6 15a2 2 0 002 2"/></svg></div>
-      <h3>沉浸歌词与玻璃光感</h3>
-      <p>全屏沉浸歌词逐行高亮，封面模糊背景、翻译歌词、字号行距都可调。玻璃表面、鼠标扫光与统一按压形变贯穿全应用。</p>
-      <span class="tag">逐行歌词 · 12 套主题</span>
-    </article>
-    <article class="feature reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></div>
-      <h3>下载、队列与音质都认真做</h3>
-      <p>批量筛选下载、音质档位实测、播放失败自动降档、倍速与定时关闭、队列拖动排序；试听片段不会被当成完整歌曲保存。</p>
-      <span class="tag">批量下载 · 实测码率</span>
-    </article>
-    <article class="feature reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H4z"/><path d="M8 21h8M12 17v4"/><path d="M8 10h4M8 13h7"/></svg></div>
-      <h3>歌手、专辑与联想搜索</h3>
-      <p>搜索页分歌手、专辑、歌曲三级结果，歌手页有大卡片、简介展开与歌曲排序；搜索联想和最近搜索都在输入框下方自然接住。</p>
-      <span class="tag">三级结果 · 卡片光效</span>
-    </article>
-    <article class="feature full reveal">
-      <div class="icon"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.34-5.66"/><path d="M20 4v5h-5"/></svg></div>
-      <h3>双源更新，不强制、不自动下载</h3>
-      <p>GitHub 不稳定时可以切到 Gitee 检查更新。发现新版本只亮红点和更新说明，下不下载由你决定；设置页「关于」还能直接看到版本、校验值与使用人数。</p>
-      <span class="tag">GitHub / Gitee · 手动确认更新</span>
-    </article>
-  </div>
-</section>
-
-<section class="shell section" id="gallery">
-  <div class="section-head reveal">
-    <div>
-      <div class="section-kicker">REAL SCREENS</div>
-      <h2>这些不是概念稿，<br>是正在运行的界面。</h2>
-    </div>
-    <p class="section-lead">顶部轮播和下方九张截图都来自 Novae 的真实运行界面，覆盖推荐、搜索、最近播放、沉浸播放、主题、歌手页、平台歌单、下载与「我喜欢的音乐」。</p>
-  </div>
-  <div class="gallery">
-    <button class="shot third reveal" type="button" data-full="assets/13-recommend.png">
-      <img src="assets/13-recommend.png" alt="Novae 推荐首页" loading="lazy">
-      <figcaption>推荐首页 <span>RECOMMEND</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/14-search.png">
-      <img src="assets/14-search.png" alt="Novae 搜索页" loading="lazy">
-      <figcaption>三级搜索结果 <span>SEARCH</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/15-history-sync.png">
-      <img src="assets/15-history-sync.png" alt="Novae 最近播放" loading="lazy">
-      <figcaption>跨平台最近播放 <span>HISTORY</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/16-downloads.png">
-      <img src="assets/16-downloads.png" alt="Novae 下载管理" loading="lazy">
-      <figcaption>批量下载与音质 <span>DOWNLOADS</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/02-immersive-press.png">
-      <img src="assets/02-immersive-press.png" alt="Novae 设置页与沉浸光感" loading="lazy">
-      <figcaption>设置页与沉浸光感 <span>SETTINGS</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/03-themes.png">
-      <img src="assets/03-themes.png" alt="Novae 多种外观选择" loading="lazy">
-      <figcaption>多种外观选择 <span>12 套主题</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/04-artist-card.png">
-      <img src="assets/04-artist-card.png" alt="Novae 歌手大卡片" loading="lazy">
-      <figcaption>歌手大卡片 <span>ARTIST</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/09-platform-playlists.png">
-      <img src="assets/09-platform-playlists.png" alt="Novae 平台歌单" loading="lazy">
-      <figcaption>平台歌单 <span>PLAYLISTS</span></figcaption>
-    </button>
-    <button class="shot third reveal" type="button" data-full="assets/12-likes.png">
-      <img src="assets/12-likes.png" alt="Novae 我喜欢的音乐" loading="lazy">
-      <figcaption>我喜欢的音乐 <span>FAVORITES</span></figcaption>
-    </button>
-  </div>
-  <p class="gallery-note">点击任意截图可查看原图。Linux / macOS 版本不在当前发布范围内。</p>
-</section>
-
-<section class="shell download" id="download">
-  <div class="download-card reveal">
-    <div>
-      <img class="download-icon" src="assets/appicon.png" alt="Novae">
-      <h2>下载 Novae，<br>打开就是播放器。</h2>
-      <p>下载 <b>novae.exe</b> 直接运行，不需要安装器。Windows 11 已内置 WebView2；Windows 10 通常也已安装，如缺失可单独安装运行时。</p>
-      <div class="hero-actions">
-        <a class="btn primary" id="directDownload" href="https://github.com/TongWang0808/novae-releases/releases/download/v1.3.8/novae.exe" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-          直接下载 novae.exe
-        </a>
-        <a class="btn" href="https://gitee.com/meiliwang0808/novae-releases/releases/latest" target="_blank" rel="noopener">Gitee Release</a>
-      </div>
-      <div class="platforms">
-        <span>Windows 10 / 11 x64</span><span>免安装</span><span>GitHub / Gitee 双源</span><span>MIT License</span>
-      </div>
-      <p class="release-note" style="margin-top:14px">实时数据来自 Novae 的匿名设备计数与仓库访问账本；下载请优先使用 GitHub Release，Gitee 为备用镜像。</p>
-    </div>
-    <div class="release-box" aria-label="最新版本信息">
-      <div class="release-row"><span>最新版本</span><b id="releaseVersion">v1.3.8</b></div>
-      <div class="release-row"><span>安装包大小</span><b id="releaseSize">49.5 MB</b></div>
-      <div class="release-row"><span>发布时间</span><b id="releaseDate">2026-11-22</b></div>
-      <div class="release-row"><span>SHA-256</span><code id="releaseSha">EE061835…B2D54</code></div>
-      <p class="release-note">版本与校验值来自仓库根目录的 latest.json；下载后可在文件属性或 PowerShell 中核对 SHA-256。</p>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="shell">
-    <div class="footer-row">
+  <section class="wrap section" id="features">
+    <div class="section-head reveal">
       <div>
-        <div class="footer-left">
-          <img src="assets/appicon.png" alt="Novae">
-          <div><b>NOVAE</b><span>发现新声音 · 为 Windows 打造</span></div>
+        <div class="kicker">WHY NOVAE</div>
+        <h2>不是换皮网页，<br>是一台真正能用的播放器。</h2>
+      </div>
+      <p>统一账号、统一队列、统一歌词与音质；平台之间不再是七个互不相通的网页。</p>
+    </div>
+    <div class="features">
+      <article class="feature reveal">
+        <div class="icon">7</div>
+        <h3>七大平台，一个账号中心</h3>
+        <p>七个平台同时登录、随时切换；每个平台显示明确的“登录入口”、账号资料、会员状态与到期时间。</p>
+        <div class="tag-row"><span class="tag">QQ / 微信</span><span class="tag">扫码</span><span class="tag">手机号</span><span class="tag">授权</span></div>
+      </article>
+      <article class="feature reveal">
+        <div class="icon">♫</div>
+        <h3>汽水会员整曲</h3>
+        <p>读取本机 SodaM signer 或 <code>QISHUI_SIGNER</code>，对 PC 端 CENC MP4 解密后本地代理播放；完整流优先，30 秒试听兜底。</p>
+        <div class="tag-row"><span class="tag">PC 签名</span><span class="tag">CENC 解密</span><span class="tag">完整流优先</span></div>
+      </article>
+      <article class="feature reveal">
+        <div class="icon">↺</div>
+        <h3>最近播放，归属真实开播源</h3>
+        <p>按实际开播的默认音源归属；预加载、续播、切音质不重复写入。QQ、酷狗、网易云可异步回写官方历史。</p>
+        <div class="tag-row"><span class="tag">默认音源</span><span class="tag">异步回写</span><span class="tag">防重复</span></div>
+      </article>
+      <article class="feature reveal">
+        <div class="icon">▤</div>
+        <h3>播放队列，完整展开</h3>
+        <p>取消分页与页码下拉框，完整列表一次展开；当前固定 5 行，第 6 首起由右侧滚动条承载，全档缩放按真实行高测量。</p>
+        <div class="tag-row"><span class="tag">5 行可视区</span><span class="tag">90% 实底</span><span class="tag">全档适配</span></div>
+      </article>
+      <article class="feature reveal">
+        <div class="icon">◎</div>
+        <h3>全缩放，全页面重排</h3>
+        <p>90% / 100% / 110% / 125% / 150% 五档缩放；推荐页按逻辑宽度重排，窄档不再出现“孤儿卡”和被裁按钮。</p>
+        <div class="tag-row"><span class="tag">逻辑宽度</span><span class="tag">卡片等高</span><span class="tag">无裁切</span></div>
+      </article>
+      <article class="feature reveal">
+        <div class="icon">◐</div>
+        <h3>沉浸光感，表面统一</h3>
+        <p>玻璃表面、指针光斑、统一按压形变；队列、右键菜单、账号卡与设置卡使用同一套表面层级。</p>
+        <div class="tag-row"><span class="tag">12 套主题</span><span class="tag">液态玻璃</span><span class="tag">按压形变</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section" id="gallery">
+    <div class="section-head reveal">
+      <div>
+        <div class="kicker">SCREENS</div>
+        <h2>这些不是概念稿，<br>是正在运行的界面。</h2>
+      </div>
+      <p>十二张实机截图，覆盖推荐、账号、歌单、搜索、歌手、外观、沉浸播放、API 兜底与反馈群。</p>
+    </div>
+    <div class="gallery" id="galleryGrid">
+      <figure class="gcard reveal" data-caption="推荐页与音乐盲盒"><img src="docs/readme-1.3.9/01-recommend.png" alt="推荐页与音乐盲盒" loading="lazy"><figcaption class="gcap"><b>推荐页与音乐盲盒</b><span>RECOMMEND</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="七大平台，一个账号中心"><img src="docs/readme-1.3.9/02-platforms.png" alt="七大平台账号聚合" loading="lazy"><figcaption class="gcap"><b>七大平台，一个账号中心</b><span>ACCOUNTS</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="同步平台歌单"><img src="docs/readme-1.3.9/03-playlists.png" alt="同步平台歌单" loading="lazy"><figcaption class="gcap"><b>同步平台歌单</b><span>PLAYLISTS</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="搜索联想与历史搜索"><img src="docs/readme-1.3.9/04-search-suggest.png" alt="搜索联想与历史搜索" loading="lazy"><figcaption class="gcap"><b>搜索联想与历史搜索</b><span>SEARCH</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="搜索结果，一览无余"><img src="docs/readme-1.3.9/05-search.png" alt="全页搜索结果" loading="lazy"><figcaption class="gcap"><b>搜索结果，一览无余</b><span>RESULTS</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="歌手简介大卡片"><img src="docs/readme-1.3.9/06-artist.png" alt="歌手简介大卡片" loading="lazy"><figcaption class="gcap"><b>歌手简介大卡片</b><span>ARTIST</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="你的外观，由你来定"><img src="docs/readme-1.3.9/07-appearance.png" alt="外观与主题设置" loading="lazy"><figcaption class="gcap"><b>你的外观，由你来定</b><span>THEMES</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="大屏播放，沉浸其中"><img src="docs/readme-1.3.9/08-immersive.png" alt="大屏沉浸播放" loading="lazy"><figcaption class="gcap"><b>大屏播放，沉浸其中</b><span>IMMERSIVE</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="不仅平台，API 也能兜底"><img src="docs/readme-1.3.9/09-api-fallback.png" alt="平台与 API 兜底" loading="lazy"><figcaption class="gcap"><b>不仅平台，API 也能兜底</b><span>FALLBACK</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="沉浸光感，按压形变"><img src="docs/readme-1.3.9/10-motion.png" alt="沉浸光感与按压形变" loading="lazy"><figcaption class="gcap"><b>沉浸光感，按压形变</b><span>MOTION</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="专辑卡片，尽收眼底"><img src="docs/readme-1.3.9/11-albums.png" alt="专辑卡片" loading="lazy"><figcaption class="gcap"><b>专辑卡片，尽收眼底</b><span>ALBUMS</span></figcaption></figure>
+      <figure class="gcard reveal" data-caption="反馈 Q 群，集思广益"><img src="docs/readme-1.3.9/12-community.png" alt="反馈 QQ 群" loading="lazy"><figcaption class="gcap"><b>反馈 Q 群，集思广益</b><span>COMMUNITY</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="wrap section" id="platforms">
+    <div class="section-head reveal">
+      <div>
+        <div class="kicker">PLATFORMS</div>
+        <h2>七个平台，<br>各有各的登录方式。</h2>
+      </div>
+      <p>网页扫码、手机号、QQ / 微信、平台授权，各走各的官方入口；不做统一假登录。</p>
+    </div>
+    <div class="platforms reveal">
+      <div class="platform"><b>QQ 音乐</b><span>网页 / QQ / 微信</span></div>
+      <div class="platform"><b>酷狗音乐</b><span>扫码</span></div>
+      <div class="platform"><b>酷我音乐</b><span>网页登录</span></div>
+      <div class="platform"><b>网易云音乐</b><span>扫码 / 手机号</span></div>
+      <div class="platform"><b>华为音乐</b><span>网页登录</span></div>
+      <div class="platform"><b>汽水音乐</b><span>扫码 / 手机号</span></div>
+      <div class="platform"><b>波点音乐</b><span>扫码</span></div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="update">
+    <div class="update reveal">
+      <div>
+        <span class="ver">● v1.3.9 · 2026-11-24</span>
+        <h2>这次更新，<br>把“能用”做完整。</h2>
+        <p>汽水与波点正式接入，最近播放重新归属，队列与账号页收口，全缩放重新适配。旧的 Release 资产全部保留。</p>
+        <a class="btn ghost" href="https://github.com/TongWang0808/novae-releases/releases/tag/v1.3.9" target="_blank" rel="noopener">阅读完整更新说明</a>
+      </div>
+      <div class="update-list">
+        <div class="update-item"><i></i><span><b>汽水音乐</b>：原生扫码、官方二次验证、手机号备用；会员整曲签名与 CENC 解密。</span></div>
+        <div class="update-item"><i></i><span><b>波点音乐</b>：原生扫码、会员到期、歌单、搜索、歌词、歌手与最近播放。</span></div>
+        <div class="update-item"><i></i><span><b>最近播放</b>：按实际开播源归属；QQ / 酷狗 / 网易云异步回写，预加载不重复。</span></div>
+        <div class="update-item"><i></i><span><b>播放队列</b>：完整列表、5 行可视区、右侧滚动条；沉浸模式 90% 实底。</span></div>
+        <div class="update-item"><i></i><span><b>账号与设置</b>：明确“登录入口”；接口地址默认脱敏，眼睛按钮才显示真实地址。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="download">
+    <div class="download reveal">
+      <div>
+        <div class="kicker">DOWNLOAD</div>
+        <h2>下载 Novae，<br>打开就是播放器。</h2>
+        <p>Windows 10 / 11 x64 单文件，替换旧版即可保留账号、歌单、最近播放与下载记录。</p>
+        <div class="cta">
+          <a class="btn primary" id="downloadPrimary2" href="https://github.com/TongWang0808/novae-releases/releases/download/v1.3.9/novae.exe" target="_blank" rel="noopener">GitHub 下载</a>
+          <a class="btn ghost" id="downloadGitee" href="https://gitee.com/meiliwang0808/novae-releases/releases/download/v1.3.9/novae.exe" target="_blank" rel="noopener">Gitee 下载</a>
         </div>
-        <p class="disclaimer">本项目为独立实现，与华为、腾讯、网易、酷狗、酷我及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置任何音源、账号或会员凭据，不破解 DRM。</p>
+        <div class="dl-meta">
+          <div class="meta-box"><span>VERSION</span><b id="versionText">1.3.9</b></div>
+          <div class="meta-box"><span>SIZE</span><b id="sizeText2">53,442,048 字节</b></div>
+          <div class="meta-box"><span>PLATFORM</span><b>Windows x64</b></div>
+          <div class="meta-box"><span>FILE VERSION</span><b>1.3.9.0</b></div>
+        </div>
+        <div class="meta-box" style="margin-top:10px">
+          <span>SHA-256</span><b id="shaFull" style="font-family:ui-monospace,Consolas,monospace">A1E543965C0E72B307B865A92721111F6392A76D2A665F4C234CDB8FBE68452F</b>
+        </div>
+        <button class="btn ghost" id="copySha" type="button" style="margin-top:12px">复制校验值</button>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub 仓库</a>
-        <a href="https://gitee.com/meiliwang0808/novae-releases" target="_blank" rel="noopener">Gitee 仓库</a>
-        <a href="https://github.com/TongWang0808/novae-releases/releases" target="_blank" rel="noopener">全部版本</a>
-        <a href="#stats">实时数据</a>
+      <div class="install">
+        <h3>安装与升级</h3>
+        <ol>
+          <li>下载 <code>novae.exe</code>，放到你习惯的应用目录。</li>
+          <li>直接替换旧版 <code>Novae.exe</code>，用户数据与登录态保留。</li>
+          <li>SmartScreen 提示时选择“更多信息 → 仍要运行”。</li>
+          <li>汽水会员整曲需本机 SodaM signer 或 <code>QISHUI_SIGNER_URL</code> / <code>QISHUI_SIGNER_TOKEN</code>。</li>
+          <li>更多说明见 <a href="usage.html">使用指南</a>。</li>
+        </ol>
       </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand" href="#top"><span class="logo">N</span><span>Novae<small>DESKTOP MUSIC</small></span></a>
+      <p>本项目为独立实现，与华为、腾讯、网易、酷狗、酷我、抖音/汽水及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。</p>
+      <p>© 2026 Novae contributors · MIT License</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub 仓库</a>
+      <a href="https://gitee.com/meiliwang0808/novae-releases" target="_blank" rel="noopener">Gitee 仓库</a>
+      <a href="https://github.com/TongWang0808/novae-releases/releases" target="_blank" rel="noopener">全部版本</a>
+      <a href="THIRD-PARTY-NOTICES.md">第三方声明</a>
+      <a href="README.md">README</a>
+      <a href="usage.html">使用指南</a>
     </div>
   </div>
 </footer>
 
 <div class="lightbox" id="lightbox" aria-hidden="true">
-  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭预览">×</button>
-  <img id="lightboxImg" src="assets/01-immersive-player.png" alt="Novae 截图预览">
+  <button id="lightboxClose" type="button" aria-label="关闭预览">×</button>
+  <img id="lightboxImg" src="docs/readme-1.3.9/01-recommend.png" alt="Novae 截图预览">
 </div>
+<div class="toast" id="toast">已复制</div>
 
 <script>
 (() => {
   "use strict";
-  const USAGE_ENDPOINT = "https://rknetrmcfwrolfrgjoiz.supabase.co/rest/v1/rpc/novae_usage_get";
-  const SUPABASE_KEY = "sb_publishable_tTgoX2sVh5pYkaoxXhssuA_n_pkhBE_";
-  const LEDGER_URL = "https://raw.githubusercontent.com/TongWang0808/novae-releases/main/stats/traffic-ledger.json";
-  const LATEST_URL = "https://raw.githubusercontent.com/TongWang0808/novae-releases/main/latest.json";
-  const REPO_API = "https://api.github.com/repos/TongWang0808/novae-releases";
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => new Intl.NumberFormat("zh-CN").format(n);
-
-  function setText(id, value) { const node = $(id); if (node) node.textContent = value; }
+  const setText = (id, value) => { const node = $(id); if (node) node.textContent = value; };
+  const USAGE_ENDPOINT = "https://rknetrmcfwrolfrgjoiz.supabase.co/rest/v1/rpc/novae_usage_get";
+  const SUPABASE_KEY = "sb_publishable_tTgoX2sVh5pYkaoxXhssuA_n_pkhBE_";
 
   function parseCount(payload) {
     if (typeof payload === "number") return payload;
@@ -701,7 +447,7 @@
     if (Math.abs(target - from) < 2) { node.textContent = fmt(target); return; }
     const started = performance.now();
     const step = (now) => {
-      const t = Math.min(1, (now - started) / 650);
+      const t = Math.min(1, (now - started) / 700);
       const eased = 1 - Math.pow(1 - t, 3);
       node.textContent = fmt(Math.round(from + (target - from) * eased));
       if (t < 1) requestAnimationFrame(step);
@@ -718,94 +464,61 @@
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const count = parseCount(await res.json());
-      if (!Number.isFinite(count)) throw new Error("返回值无法识别");
+      if (!Number.isFinite(count)) throw new Error("bad payload");
       animateNumber($("usageCount"), count);
-      setText("heroUsage", "LIVE · " + fmt(count) + " 台设备使用过");
-      setText("usageNote", "最后更新 " + new Date().toLocaleTimeString("zh-CN", { hour12: false }) + " · 同一台电脑只计一次");
       localStorage.setItem("novae-site-usage", String(count));
     } catch (err) {
       const cached = Number(localStorage.getItem("novae-site-usage"));
-      if (Number.isFinite(cached) && cached >= 0) {
-        setText("usageCount", fmt(cached));
-        setText("heroUsage", "LIVE · 离线缓存");
-        setText("usageNote", "统计服务暂时不可达，显示上次缓存");
-      } else {
-        setText("usageNote", "暂时无法连接统计服务");
-      }
+      if (Number.isFinite(cached) && cached >= 0) animateNumber($("usageCount"), cached);
     }
   }
 
   async function loadTraffic() {
     try {
-      const res = await fetch(LEDGER_URL, { cache: "no-store" });
+      const res = await fetch("stats/visits.json", { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-      const totals = data.totals || {};
-      const total = Number(totals.total);
-      if (!Number.isFinite(total)) throw new Error("访问数据无法识别");
-      animateNumber($("repoViews"), total);
-      setText("ghViews", fmt(Number(totals.github) || 0));
-      setText("giteeViews", fmt(Number(totals.gitee) || 0));
-      const updated = String(data.updatedAt || "").slice(0, 10);
-      if (updated) setText("versionNote", "Windows 10 / 11 · x64 · 统计更新 " + updated);
-      localStorage.setItem("novae-site-views", JSON.stringify(totals));
-    } catch (err) {
-      try {
-        const cached = JSON.parse(localStorage.getItem("novae-site-views") || "null");
-        if (cached && Number.isFinite(Number(cached.total))) {
-          setText("repoViews", fmt(Number(cached.total)));
-          setText("ghViews", fmt(Number(cached.github) || 0));
-          setText("giteeViews", fmt(Number(cached.gitee) || 0));
-        }
-      } catch (_) {}
-    }
+      const total = Number(data.total);
+      if (Number.isFinite(total)) animateNumber($("viewCount"), total);
+    } catch (err) {}
   }
 
   async function loadLatest() {
     try {
-      const res = await fetch(LATEST_URL, { cache: "no-store" });
+      const res = await fetch("latest.json", { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       const version = String(data.version || "").trim();
       const asset = data.assets && data.assets["windows-amd64"];
       if (version) {
         setText("versionText", version);
-        setText("releaseVersion", "v" + version);
+        document.title = "Novae " + version + " · 七个平台，一个播放器";
       }
       if (asset && Number.isFinite(Number(asset.size))) {
-        setText("releaseSize", (Number(asset.size) / 1048576).toFixed(1) + " MB");
-      }
-      if (asset && asset.url) {
-        const direct = $("directDownload");
-        if (direct) direct.href = asset.url;
-      }
-      if (data.publishedAt) {
-        const date = new Date(data.publishedAt);
-        if (!Number.isNaN(date.getTime())) setText("releaseDate", date.toLocaleDateString("zh-CN"));
+        const mb = (Number(asset.size) / 1048576).toFixed(1) + " MB";
+        setText("sizeText", mb);
+        setText("sizeText2", fmt(Number(asset.size)) + " 字节");
       }
       if (asset && asset.sha256) {
         const sha = String(asset.sha256).toUpperCase();
-        setText("releaseSha", sha.slice(0, 8) + "…" + sha.slice(-5));
-        $( "releaseSha" ).title = sha;
+        setText("shaShort", sha.slice(0, 8) + "…" + sha.slice(-5));
+        setText("shaFull", sha);
       }
+      if (asset && asset.url) {
+        ["downloadPrimary", "downloadPrimary2"].forEach((id) => { const node = $(id); if (node) node.href = asset.url; });
+      }
+    } catch (err) {}
+    try {
+      const res = await fetch("latest-gitee.json", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      const asset = data.assets && data.assets["windows-amd64"];
+      if (asset && asset.url) { const node = $("downloadGitee"); if (node) node.href = asset.url; }
     } catch (err) {}
   }
 
-  async function loadRepoStats() {
-    try {
-      const res = await fetch(REPO_API, { cache: "no-store", headers: { Accept: "application/vnd.github+json" } });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      if (Number.isFinite(data.stargazers_count)) animateNumber($("starCount"), data.stargazers_count);
-      if (Number.isFinite(data.forks_count)) animateNumber($("forkCount"), data.forks_count);
-    } catch (err) {
-      // 未登录的 GitHub API 可能限流；默认值来自页面制作时的公开仓库状态。
-    }
-  }
-
-  // nav / reveal
-  const navWrap = $("navWrap");
-  const onScroll = () => navWrap.classList.toggle("scrolled", window.scrollY > 18);
+  const nav = $("nav");
+  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 18);
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -815,16 +528,16 @@
     }
   }, { threshold: 0.12, rootMargin: "0px 0px -4% 0px" }) : null;
   document.querySelectorAll(".reveal").forEach((node, index) => {
-    node.style.transitionDelay = Math.min(index % 6, 4) * 40 + "ms";
+    node.style.transitionDelay = Math.min(index % 6, 4) * 45 + "ms";
     if (revealObserver) revealObserver.observe(node); else node.classList.add("in");
   });
 
-  // lightbox
   const lightbox = $("lightbox");
   const lightboxImg = $("lightboxImg");
-  document.querySelectorAll(".shot").forEach((shot) => {
-    shot.addEventListener("click", () => {
-      lightboxImg.src = shot.dataset.full || shot.querySelector("img").src;
+  document.querySelectorAll(".gcard").forEach((card) => {
+    card.addEventListener("click", () => {
+      lightboxImg.src = card.querySelector("img").src;
+      lightboxImg.alt = card.dataset.caption || "Novae 截图预览";
       lightbox.classList.add("open");
       lightbox.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
@@ -839,113 +552,26 @@
   lightbox.addEventListener("click", (event) => { if (event.target === lightbox) closeLightbox(); });
   document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeLightbox(); });
 
-  // hero carousel
-  const heroCarousel = $("heroCarousel");
-  const heroTrack = $("heroTrack");
-  const heroSlides = heroCarousel ? Array.from(heroCarousel.querySelectorAll(".hero-slide")) : [];
-  if (heroCarousel && heroTrack && heroSlides.length) {
-    const heroDots = $("heroDots");
-    const heroCounter = $("heroCounter");
-    const heroTitle = $("heroTitle");
-    const heroWindowLabel = $("heroWindowLabel");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let heroIndex = 0;
-    let heroTimer = 0;
-
-    heroSlides.forEach((slide, index) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "hero-dot";
-      dot.setAttribute("role", "tab");
-      dot.setAttribute("aria-label", "第 " + (index + 1) + " 张：" + (slide.dataset.title || "界面截图"));
-      dot.addEventListener("click", () => goHero(index, true));
-      heroDots.appendChild(dot);
-    });
-    const dots = Array.from(heroDots.children);
-
-    function stopHero() {
-      if (heroTimer) { window.clearInterval(heroTimer); heroTimer = 0; }
-    }
-    function scheduleHero() {
-      stopHero();
-      if (!reduceMotion.matches) heroTimer = window.setInterval(() => goHero(heroIndex + 1), 6400);
-    }
-    function goHero(next, userAction) {
-      const total = heroSlides.length;
-      heroIndex = ((next % total) + total) % total;
-      heroTrack.style.transform = "translate3d(-" + (heroIndex * heroCarousel.clientWidth) + "px,0,0)";
-      heroSlides.forEach((slide, index) => {
-        const active = index === heroIndex;
-        slide.setAttribute("aria-hidden", active ? "false" : "true");
-        dots[index].setAttribute("aria-selected", active ? "true" : "false");
-        dots[index].tabIndex = active ? 0 : -1;
-      });
-      const slide = heroSlides[heroIndex];
-      const kicker = slide.dataset.kicker || "SCREEN";
-      const title = slide.dataset.title || slide.querySelector("img")?.alt || "";
-      heroCounter.textContent = String(heroIndex + 1).padStart(2, "0") + " / " + String(total).padStart(2, "0");
-      heroTitle.textContent = title;
-      heroWindowLabel.textContent = "NOVAE · " + kicker;
-      if (userAction) scheduleHero();
-    }
-
-    goHero(0, false);
-    scheduleHero();
-    window.addEventListener("resize", () => goHero(heroIndex, false));
-
-    $("heroPrev").addEventListener("click", () => goHero(heroIndex - 1, true));
-    $("heroNext").addEventListener("click", () => goHero(heroIndex + 1, true));
-    heroCarousel.addEventListener("mouseenter", stopHero);
-    heroCarousel.addEventListener("mouseleave", scheduleHero);
-    heroCarousel.addEventListener("focusin", stopHero);
-    heroCarousel.addEventListener("focusout", scheduleHero);
-    heroCarousel.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowLeft") { event.preventDefault(); goHero(heroIndex - 1, true); }
-      if (event.key === "ArrowRight") { event.preventDefault(); goHero(heroIndex + 1, true); }
-    });
-
-    let heroStartX = null;
-    heroCarousel.addEventListener("pointerdown", (event) => {
-      if (event.target.closest("button")) return;
-      heroStartX = event.clientX;
-      stopHero();
-    });
-    heroCarousel.addEventListener("pointerup", (event) => {
-      if (heroStartX === null) return;
-      const delta = event.clientX - heroStartX;
-      heroStartX = null;
-      if (Math.abs(delta) > 46) goHero(heroIndex + (delta < 0 ? 1 : -1), true);
-      else scheduleHero();
-    });
-    heroCarousel.addEventListener("pointercancel", () => { heroStartX = null; scheduleHero(); });
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stopHero(); else scheduleHero();
-    });
-    reduceMotion.addEventListener?.("change", scheduleHero);
+  const toast = $("toast");
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add("show");
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1600);
   }
-
-  $("navBurger").addEventListener("click", () => {
-    const links = document.querySelector(".nav-links");
-    const open = links.style.display === "flex";
-    links.style.display = open ? "" : "flex";
-    links.style.position = "absolute";
-    links.style.top = "72px";
-    links.style.left = "14px";
-    links.style.right = "14px";
-    links.style.padding = "10px";
-    links.style.border = "1px solid var(--line)";
-    links.style.borderRadius = "12px";
-    links.style.background = "rgba(12,12,17,.94)";
-    links.style.zIndex = "60";
+  $("copySha").addEventListener("click", async () => {
+    const sha = $("shaFull").textContent.trim();
+    try {
+      await navigator.clipboard.writeText(sha);
+      showToast("SHA-256 已复制");
+    } catch (err) {
+      showToast("复制失败，请手动选择");
+    }
   });
 
   loadUsage();
   loadTraffic();
   loadLatest();
-  loadRepoStats();
-  setInterval(() => { if (!document.hidden) loadUsage(); }, 30000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { loadUsage(); loadTraffic(); } });
 })();
 </script>
 </body>
