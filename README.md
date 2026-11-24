@@ -95,6 +95,7 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - 账号详情改为“登录入口”，按平台显示扫码 / 账号 / 授权入口；账号页补齐用途说明与统一 Hero 表面。
 - 设置页接口地址默认脱敏并只读，眼睛按钮切换显示与编辑；账号卡接口地址同步脱敏。
 - 汽水 / 波点会员字标缩放到 10px 高、32px 宽；账号默认音源卡改半透明玻璃。
+- 软件内「设置 → 关于 → 致谢与开源许可」同步到 2026-11-24 / 1.3.9：补入 SodaM、mygo-music-qishui、bowen_music 与 11 个新增 Go 模块，模块清单从 20 个更新为 31 个。
 - 全页面 90% / 100% / 110% / 125% / 150% 五档适配；推荐页按逻辑宽度重排。
 - 播放接口可用性探测、播放解析回退、最近播放元数据补全、缓存键与歌曲信息整理。
 
@@ -113,13 +114,13 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 - 版本：**1.3.9**（Windows 文件版本 / 产品版本 `1.3.9.0`）
 - 安装包：`novae.exe`
-- 大小：`53,442,048` 字节
-- SHA-256：`A1E543965C0E72B307B865A92721111F6392A76D2A665F4C234CDB8FBE68452F`
+- 大小：`53,446,144` 字节
+- SHA-256：`58F92812C2423FF9EC904418F28D853B3337C19679A693EDCF7215B059CB7CD2`
 - GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.3.9>
 - Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.3.9>
 
 ```text
-A1E543965C0E72B307B865A92721111F6392A76D2A665F4C234CDB8FBE68452F  novae.exe
+58F92812C2423FF9EC904418F28D853B3337C19679A693EDCF7215B059CB7CD2  novae.exe
 ```
 
 ## 安装
