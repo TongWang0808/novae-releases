@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="preload" as="image" href="assets/screens/01-recommend.webp" fetchpriority="high">
 <link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="zh_CN">
@@ -552,7 +553,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
     </div>
     <figure class="hero-stage reveal" style="--delay:300ms">
       <div class="hero-window">
-        <img src="docs/readme-1.3.9/01-recommend.png" alt="Novae 推荐页，包含每日专辑、音乐盲盒、今日精选与本周热听" width="1280" height="800" fetchpriority="high">
+        <img src="assets/screens/01-recommend.webp" alt="Novae 推荐页，包含每日专辑、音乐盲盒、今日精选与本周热听" width="1651" height="997" fetchpriority="high">
       </div>
       <figcaption class="hero-caption"><span>推荐页 · 音乐盲盒 · 今日精选 · 本周热听</span><span>Novae 1.4.0 实机界面</span></figcaption>
     </figure>
@@ -598,7 +599,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual reveal" style="--delay:80ms">
-          <img src="docs/readme-1.3.9/02-platforms.png" alt="Novae 七大平台账号中心" width="1280" height="800" loading="lazy">
+          <img src="assets/screens/02-platforms.webp" alt="Novae 七大平台账号中心" width="1651" height="997" loading="lazy">
           <figcaption>七大平台，一个账号中心</figcaption>
         </figure>
       </div>
@@ -615,7 +616,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual dark-image reveal" style="--delay:80ms">
-          <img src="docs/readme-1.3.9/08-immersive.png" alt="Novae 大屏沉浸播放界面" width="1280" height="800" loading="lazy">
+          <img src="assets/screens/08-immersive.webp" alt="Novae 大屏沉浸播放界面" width="1651" height="997" loading="lazy">
           <figcaption>大屏播放，沉浸其中</figcaption>
         </figure>
       </div>
@@ -632,7 +633,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual reveal" style="--delay:80ms">
-          <img src="docs/readme-1.3.9/10-motion.png" alt="Novae 沉浸光感、主题与按压形变设置" width="1280" height="800" loading="lazy">
+          <img src="assets/screens/10-motion.webp" alt="Novae 沉浸光感、主题与按压形变设置" width="1651" height="997" loading="lazy">
           <figcaption>沉浸光感，按压形变</figcaption>
         </figure>
       </div>
@@ -671,7 +672,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
       <div class="showcase-stage">
         <div class="showcase-media reveal">
           <div class="showcase-frame" id="showcaseFrame">
-            <img id="showcaseImage" src="docs/readme-1.3.9/01-recommend.png" alt="推荐页与音乐盲盒" width="1280" height="800" loading="lazy">
+            <img id="showcaseImage" src="assets/screens/01-recommend.webp" alt="推荐页与音乐盲盒" width="1651" height="997" loading="lazy">
           </div>
           <div class="showcase-controls">
             <button class="round-btn" id="prevSlide" type="button" aria-label="上一张截图">
@@ -693,18 +694,18 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
       </div>
 
       <div class="thumb-strip reveal" id="thumbStrip" aria-label="界面截图缩略图">
-        <button class="thumb" type="button" aria-label="查看推荐页与音乐盲盒" aria-current="true" data-title="推荐页与音乐盲盒" data-desc="每日专辑、音乐盲盒、今日精选与本周热听，在首屏自然排开，不用先做选择。"><img src="docs/readme-1.3.9/01-recommend.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看七大平台账号中心" data-title="七大平台，一个账号中心" data-desc="七种官方登录入口，会员状态、到期时间与账号资料在一屏里看清。"><img src="docs/readme-1.3.9/02-platforms.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看平台歌单同步" data-title="同步平台歌单" data-desc="平台歌单与本地收藏并排，加入、移出和新建都不用切回网页。"><img src="docs/readme-1.3.9/03-playlists.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看搜索联想与历史搜索" data-title="搜索联想与历史搜索" data-desc="输入一句，联想、历史和搜索结果留在同一条动线上。"><img src="docs/readme-1.3.9/04-search-suggest.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看全页搜索结果" data-title="搜索结果，一览无余" data-desc="歌曲、歌手、专辑三类结果完整展开，不再藏在二级标签里。"><img src="docs/readme-1.3.9/05-search.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看歌手简介大卡片" data-title="歌手简介大卡片" data-desc="简介、热门歌曲与专辑，按真实信息层级展开，来源随时可切换。"><img src="docs/readme-1.3.9/06-artist.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看外观与主题设置" data-title="你的外观，由你来定" data-desc="十二套主题与五档材质，界面跟着你的桌面、时间和心情走。"><img src="docs/readme-1.3.9/07-appearance.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看大屏沉浸播放" data-title="大屏播放，沉浸其中" data-desc="封面、歌词与播放控制退到只剩音乐本身，适合放在第二块屏幕。"><img src="docs/readme-1.3.9/08-immersive.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看平台与 API 兜底" data-title="不仅平台，API 也能兜底" data-desc="平台取流失败时接云端音源，不因为一个接口停下整段播放。"><img src="docs/readme-1.3.9/09-api-fallback.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看沉浸光感与按压形变" data-title="沉浸光感，按压形变" data-desc="玻璃表面、指针光斑与统一按压形变，五档厚度可以细调。"><img src="docs/readme-1.3.9/10-motion.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看专辑卡片" data-title="专辑卡片，尽收眼底" data-desc="专辑信息、曲目与封面按逻辑宽度重排，窄窗口也不裁切。"><img src="docs/readme-1.3.9/11-albums.png" alt="" loading="lazy"></button>
-        <button class="thumb" type="button" aria-label="查看反馈 QQ 群" data-title="反馈 Q 群，集思广益" data-desc="问题、建议与版本反馈直接进群说，更新方向由真实使用决定。"><img src="docs/readme-1.3.9/12-community.png" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看推荐页与音乐盲盒" aria-current="true" data-title="推荐页与音乐盲盒" data-desc="每日专辑、音乐盲盒、今日精选与本周热听，在首屏自然排开，不用先做选择。" data-src="assets/screens/01-recommend.webp"><img src="assets/screens/thumbs/01-recommend.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看七大平台账号中心" data-title="七大平台，一个账号中心" data-desc="七种官方登录入口，会员状态、到期时间与账号资料在一屏里看清。" data-src="assets/screens/02-platforms.webp"><img src="assets/screens/thumbs/02-platforms.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看平台歌单同步" data-title="同步平台歌单" data-desc="平台歌单与本地收藏并排，加入、移出和新建都不用切回网页。" data-src="assets/screens/03-playlists.webp"><img src="assets/screens/thumbs/03-playlists.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看搜索联想与历史搜索" data-title="搜索联想与历史搜索" data-desc="输入一句，联想、历史和搜索结果留在同一条动线上。" data-src="assets/screens/04-search-suggest.webp"><img src="assets/screens/thumbs/04-search-suggest.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看全页搜索结果" data-title="搜索结果，一览无余" data-desc="歌曲、歌手、专辑三类结果完整展开，不再藏在二级标签里。" data-src="assets/screens/05-search.webp"><img src="assets/screens/thumbs/05-search.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看歌手简介大卡片" data-title="歌手简介大卡片" data-desc="简介、热门歌曲与专辑，按真实信息层级展开，来源随时可切换。" data-src="assets/screens/06-artist.webp"><img src="assets/screens/thumbs/06-artist.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看外观与主题设置" data-title="你的外观，由你来定" data-desc="十二套主题与五档材质，界面跟着你的桌面、时间和心情走。" data-src="assets/screens/07-appearance.webp"><img src="assets/screens/thumbs/07-appearance.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看大屏沉浸播放" data-title="大屏播放，沉浸其中" data-desc="封面、歌词与播放控制退到只剩音乐本身，适合放在第二块屏幕。" data-src="assets/screens/08-immersive.webp"><img src="assets/screens/thumbs/08-immersive.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看平台与 API 兜底" data-title="不仅平台，API 也能兜底" data-desc="平台取流失败时接云端音源，不因为一个接口停下整段播放。" data-src="assets/screens/09-api-fallback.webp"><img src="assets/screens/thumbs/09-api-fallback.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看沉浸光感与按压形变" data-title="沉浸光感，按压形变" data-desc="玻璃表面、指针光斑与统一按压形变，五档厚度可以细调。" data-src="assets/screens/10-motion.webp"><img src="assets/screens/thumbs/10-motion.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看专辑卡片" data-title="专辑卡片，尽收眼底" data-desc="专辑信息、曲目与封面按逻辑宽度重排，窄窗口也不裁切。" data-src="assets/screens/11-albums.webp"><img src="assets/screens/thumbs/11-albums.webp" alt="" loading="lazy"></button>
+        <button class="thumb" type="button" aria-label="查看反馈 QQ 群" data-title="反馈 Q 群，集思广益" data-desc="问题、建议与版本反馈直接进群说，更新方向由真实使用决定。" data-src="assets/screens/12-community.webp"><img src="assets/screens/thumbs/12-community.webp" alt="" loading="lazy"></button>
       </div>
       <div class="gallery-foot"><span>实机截图 · Windows 10 / 11 · 1.4.0</span><span>点击缩略图切换，点击大图查看全屏</span></div>
     </div>
@@ -827,7 +828,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
   <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭预览">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 6 12 12m0-12L6 18"/></svg>
   </button>
-  <img id="lightboxImg" src="docs/readme-1.3.9/01-recommend.png" alt="Novae 截图预览">
+  <img id="lightboxImg" src="assets/screens/01-recommend.webp" alt="Novae 截图预览">
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
 
@@ -974,7 +975,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
   function setSlide(index, instant = false) {
     current = (index + thumbs.length) % thumbs.length;
     const thumb = thumbs[current];
-    const nextSrc = thumb.querySelector("img").src;
+    const nextSrc = thumb.dataset.src || thumb.querySelector("img").src;
     const nextAlt = thumb.dataset.title;
     thumbs.forEach((item, i) => item.setAttribute("aria-current", String(i === current)));
     window.clearTimeout(switchTimer);
