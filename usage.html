@@ -2,206 +2,372 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Novae 使用指南 · 登录、播放与更新</title>
-<meta name="description" content="Novae 1.4.0 使用指南：安装、七个平台登录、汽水 signer、最近播放、队列、缩放、接口地址与常见问题。">
-<meta name="theme-color" content="#f7faff">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Novae 使用指南 - 安装、登录与播放</title>
+<meta name="description" content="Novae 1.4.0 使用指南：安装、七个平台登录、汽水 signer、最近播放、播放队列、界面缩放、接口地址与常见问题。">
+<meta name="theme-color" content="#fbfbfd">
+<meta name="color-scheme" content="light">
+<link rel="canonical" href="https://tongwang0808.github.io/novae-releases/usage.html">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>document.documentElement.classList.add('js');</script>
 <style>
 :root{
-  --ink:#0b1424;--ink-2:#24324a;--muted:#64748b;--canvas:#f7faff;--card:rgba(255,255,255,.78);
-  --line:rgba(15,23,42,.09);--line-strong:rgba(15,23,42,.16);--blue:#2f6fed;--cyan:#14c8e5;
-  --violet:#8b5cf6;--mint:#3dd6ae;--shadow:0 20px 60px rgba(38,70,130,.12);--shadow-sm:0 10px 30px rgba(38,70,130,.08);
+  --bg:#fbfbfd;
+  --bg-alt:#f5f5f7;
+  --white:#ffffff;
+  --ink:#1d1d1f;
+  --ink-2:#333336;
+  --muted:#6e6e73;
+  --muted-2:#86868b;
+  --hair:rgba(0,0,0,.12);
+  --hair-soft:rgba(0,0,0,.07);
+  --accent:#7b68ad;
+  --nav-h:54px;
+  --max:1080px;
+  --ease:cubic-bezier(.4,0,.22,1);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI Variable Display","Segoe UI","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
-  margin:0;color:var(--ink);
-  background:
-    radial-gradient(900px 620px at 8% -6%,rgba(87,147,255,.18),transparent 60%),
-    radial-gradient(800px 620px at 96% 2%,rgba(20,200,229,.14),transparent 62%),
-    radial-gradient(700px 600px at 50% 108%,rgba(139,92,246,.10),transparent 65%),
-    var(--canvas);
-  font-family:"Segoe UI Variable Display","Segoe UI","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
-  font-size:16px;line-height:1.75;overflow-x:hidden;
+  margin:0;color:var(--ink);background:var(--bg);
+  font-family:var(--font);font-size:17px;line-height:1.58;letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
 }
+body.menu-open{overflow:hidden}
 a{color:inherit;text-decoration:none}
-img{max-width:100%;display:block}
-::selection{background:rgba(47,111,237,.18)}
-.wrap{width:min(1040px,calc(100% - 40px));margin:0 auto}
-.nav{position:sticky;top:0;z-index:40;padding:14px 0;background:rgba(247,250,255,.78);backdrop-filter:blur(18px) saturate(150%);border-bottom:1px solid var(--line)}
-.nav-inner{display:flex;align-items:center;gap:14px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800}
-.logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:900;background:conic-gradient(from 160deg,var(--blue),var(--cyan),var(--violet),var(--blue));box-shadow:0 8px 22px rgba(47,111,237,.35)}
-.brand small{display:block;font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:700;margin-top:-5px}
-.nav-links{display:flex;gap:4px;margin-left:auto}
-.nav-links a{padding:8px 11px;border-radius:10px;color:var(--muted);font-size:13px;font-weight:600}
-.nav-links a:hover{color:var(--ink);background:rgba(15,23,42,.05)}
-.nav-cta{padding:8px 13px;border-radius:11px;background:var(--ink);color:#fff;font-size:12px;font-weight:700}
-.hero{padding:58px 0 16px;display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
-.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-size:11px;font-weight:900;letter-spacing:.16em}
-.kicker:before{content:"";width:18px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
-h1{font-size:clamp(34px,4vw,50px);line-height:1.1;letter-spacing:-.045em;margin:12px 0 14px;font-weight:900}
-h1 em{font-style:normal;background:linear-gradient(110deg,var(--blue),var(--cyan) 48%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{color:var(--muted);font-size:15px;margin:0 0 22px;max-width:610px}
-.quick{display:flex;flex-wrap:wrap;gap:9px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 17px;border-radius:12px;font-weight:800;font-size:13px;border:1px solid transparent;transition:.22s}
-.btn.primary{color:#fff;background:linear-gradient(135deg,var(--blue),#5b8cff 55%,var(--cyan));box-shadow:0 12px 26px rgba(47,111,237,.25)}
-.btn.primary:hover{transform:translateY(-2px)}
-.btn.ghost{background:rgba(255,255,255,.72);border-color:var(--line-strong);color:var(--ink)}
-.btn.ghost:hover{background:#fff;box-shadow:var(--shadow-sm)}
-.hero-stack{display:grid;gap:10px;transform:rotate(-1deg)}
-.hero-stack img{border-radius:16px;border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow);object-fit:cover;aspect-ratio:16/9}
-.hero-stack .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hero-stack .two img{aspect-ratio:4/3}
-.layout{display:grid;grid-template-columns:220px 1fr;gap:34px;padding:38px 0 30px;align-items:start}
-.toc{position:sticky;top:78px;padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.62);backdrop-filter:blur(14px);box-shadow:var(--shadow-sm)}
-.toc b{display:block;font-size:11px;letter-spacing:.14em;color:var(--blue);margin-bottom:10px}
-.toc a{display:block;padding:7px 8px;border-radius:8px;color:var(--muted);font-size:12px;font-weight:600}
-.toc a:hover{color:var(--ink);background:rgba(15,23,42,.05)}
-.content{min-width:0}
-section{padding:0 0 36px}
-h2{font-size:26px;line-height:1.2;letter-spacing:-.035em;margin:0 0 14px;font-weight:900}
-h3{font-size:17px;margin:20px 0 8px;letter-spacing:-.02em}
-p{color:var(--muted);font-size:14px;margin:8px 0}
-.card{padding:24px;border:1px solid var(--line);border-radius:22px;background:var(--card);backdrop-filter:blur(16px);box-shadow:var(--shadow-sm);margin:12px 0}
-.steps{display:grid;gap:10px;counter-reset:step}
-.step{display:flex;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.6)}
-.step:before{counter-increment:step;content:counter(step);flex:0 0 26px;height:26px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-size:12px;font-weight:900}
-.step span{font-size:13px;color:var(--ink-2);line-height:1.7}
-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;margin:12px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.62)}
-th,td{padding:10px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{background:rgba(47,111,237,.07);color:var(--ink);font-size:11px;letter-spacing:.03em}
-tr:last-child td{border-bottom:0}
-td b{color:var(--ink)}
-code{padding:2px 6px;border-radius:6px;background:rgba(15,23,42,.055);font-size:11px;font-family:ui-monospace,Consolas,monospace}
-.note{padding:14px 16px;border-left:3px solid var(--blue);border-radius:0 12px 12px 0;background:rgba(47,111,237,.06);color:var(--ink-2);font-size:13px;line-height:1.75;margin:12px 0}
-.warn{border-left-color:#f59e0b;background:rgba(245,158,11,.08)}
-.faq{display:grid;gap:9px}
-details{border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.64);padding:13px 15px}
-summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--ink-2)}
-details p{margin:9px 0 0;font-size:12px}
-.links{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
-.links a{padding:7px 10px;border-radius:9px;background:rgba(15,23,42,.05);font-size:11px;font-weight:700;color:var(--ink-2)}
-.links a:hover{background:rgba(47,111,237,.1);color:var(--blue)}
-.footer{padding:34px 0 40px;border-top:1px solid var(--line);margin-top:20px}
-.footer p{font-size:11px;line-height:1.9;margin:0;max-width:800px}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9em;color:var(--ink-2);background:rgba(0,0,0,.045);padding:2px 5px;border-radius:4px;word-break:break-word}
+::selection{background:rgba(123,104,173,.18)}
+:focus-visible{outline:2px solid rgba(123,104,173,.7);outline-offset:3px}
+.wrap{width:min(var(--max),calc(100% - 48px));margin:0 auto}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.nav{
+  position:fixed;inset:0 0 auto;z-index:1000;height:var(--nav-h);
+  background:rgba(251,251,253,.78);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
+  border-bottom:1px solid transparent;transition:background .3s var(--ease),border-color .3s var(--ease);
+}
+.nav.scrolled{background:rgba(251,251,253,.92);border-bottom-color:var(--hair-soft)}
+.nav-inner{height:100%;display:flex;align-items:center;gap:34px}
+.brand{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;letter-spacing:-.02em;white-space:nowrap}
+.brand img{width:26px;height:26px;object-fit:contain}
+.brand .brand-sub{font-size:9px;letter-spacing:.16em;color:var(--muted-2);font-weight:500;transform:translateY(1px)}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{padding:7px 11px;font-size:12px;line-height:1;color:var(--muted);border-radius:9px;transition:color .18s var(--ease),background .18s var(--ease)}
+.nav-links a:hover,.nav-links a[aria-current="true"]{color:var(--ink);background:rgba(0,0,0,.045)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-cta{min-height:29px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--ink);color:#fff;font-size:11px;font-weight:500;transition:background .18s var(--ease),transform .18s var(--ease)}
+.nav-cta:hover{background:#000;transform:translateY(-1px)}
+.menu-toggle{display:none;width:36px;height:36px;border:0;background:transparent;cursor:pointer;align-items:center;justify-content:center;border-radius:8px}
+.menu-toggle span{display:block;width:18px;height:1px;background:var(--ink);transition:transform .22s var(--ease)}
+.menu-toggle span + span{margin-top:6px}
+.menu-toggle[aria-expanded="true"] span:first-child{transform:translateY(7px) rotate(45deg)}
+.menu-toggle[aria-expanded="true"] span:last-child{transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{
+  position:fixed;left:0;right:0;top:var(--nav-h);z-index:999;display:none;padding:10px 24px 24px;
+  background:rgba(251,251,253,.96);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
+  border-bottom:1px solid var(--hair-soft);opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:opacity .22s var(--ease),transform .22s var(--ease),visibility .22s;
+}
+.mobile-menu.open{opacity:1;visibility:visible;transform:none}
+.mobile-menu a{display:flex;align-items:center;justify-content:space-between;padding:14px 2px;font-size:16px;border-bottom:1px solid var(--hair-soft);color:var(--ink-2)}
+.mobile-menu a:last-child{border-bottom:0}
+.mobile-menu small{color:var(--muted-2);font-size:11px;letter-spacing:.08em}
+
+.eyebrow{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+.eyebrow:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.05em;line-height:1.08}
+h1{font-size:clamp(46px,6vw,76px)}
+h2{font-size:clamp(30px,3.4vw,40px);line-height:1.15}
+h3{font-size:17px;line-height:1.35;letter-spacing:-.03em}
+p{margin:0}
+.lead{color:var(--ink-2);font-size:clamp(17px,1.7vw,20px);line-height:1.62}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:999px;border:1px solid transparent;font-size:13px;font-weight:500;line-height:1;white-space:nowrap;cursor:pointer;transition:transform .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease)}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#000;transform:translateY(-1px)}
+.btn.secondary{background:transparent;border-color:var(--hair);color:var(--ink)}
+.btn.secondary:hover{background:var(--white);transform:translateY(-1px)}
+.btn svg{width:13px;height:13px}
+.text-link{display:inline-flex;align-items:center;gap:7px;color:var(--accent);font-size:13px;font-weight:500}
+.text-link svg{width:12px;height:12px;transition:transform .2s var(--ease)}
+.text-link:hover svg{transform:translateX(3px)}
 .reveal{opacity:1;transform:none}
-.reveal.in{opacity:1;transform:none}
+.js .reveal{opacity:0;transform:translateY(22px);transition:opacity .75s var(--ease),transform .75s var(--ease);transition-delay:var(--delay,0ms)}
+.js .reveal.is-in{opacity:1;transform:none}
+
+/* ===== 头部 ===== */
+.hero{padding:calc(var(--nav-h) + 86px) 0 46px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:68px;align-items:end}
+.hero h1{max-width:760px}
+.hero-lead{max-width:720px;margin-top:23px}
+.hero-actions{display:flex;align-items:center;gap:18px;margin-top:28px}
+.guide-meta{border-top:1px solid var(--hair);padding-top:2px}
+.guide-meta div{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 0;border-bottom:1px solid var(--hair-soft)}
+.guide-meta span{color:var(--muted-2);font-size:9px;font-weight:600;letter-spacing:.1em}
+.guide-meta b{color:var(--ink-2);font-size:11px;font-weight:500;text-align:right}
+.guide-visual{margin-top:50px}
+.guide-visual img{width:100%;height:auto;border-radius:16px;box-shadow:0 20px 52px rgba(0,0,0,.11),0 0 0 1px rgba(0,0,0,.04);background:#fff}
+.guide-visual figcaption{display:flex;justify-content:space-between;gap:18px;margin-top:12px;color:var(--muted-2);font-size:10px}
+
+/* ===== 指南布局 ===== */
+.guide-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:68px;padding:32px 0 96px;align-items:start}
+.toc{position:sticky;top:calc(var(--nav-h) + 24px)}
+.toc-title{color:var(--muted-2);font-size:9px;font-weight:600;letter-spacing:.14em;margin:0 0 10px}
+.toc nav a{display:block;padding:8px 0;color:var(--muted);font-size:12px;border-bottom:1px solid var(--hair-soft);transition:color .18s var(--ease)}
+.toc nav a:hover,.toc nav a[aria-current="true"]{color:var(--ink)}
+.toc nav a[aria-current="true"]{font-weight:500}
+.toc-help{margin-top:18px;color:var(--muted-2);font-size:10px;line-height:1.7}
+.toc-help a{color:var(--accent)}
+
+.guide-content{min-width:0}
+.guide-section{padding:0 0 54px;margin-bottom:54px;border-bottom:1px solid var(--hair)}
+.guide-section:last-child{border-bottom:0;margin-bottom:0}
+.section-number{color:var(--muted-2);font-size:10px;font-weight:600;letter-spacing:.1em;margin-bottom:10px}
+.guide-section h2{max-width:760px;margin-bottom:18px}
+.guide-section > p{max-width:740px;color:var(--muted);font-size:15px;line-height:1.75}
+.guide-section h3{margin-top:30px;margin-bottom:8px;color:var(--ink)}
+.guide-section h3 + p{margin-top:0}
+.guide-section p + p{margin-top:10px}
+.steps{display:grid;margin-top:22px;border-top:1px solid var(--hair-soft)}
+.step{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;padding:15px 0;border-bottom:1px solid var(--hair-soft);align-items:start}
+.step em{font-style:normal;color:var(--muted-2);font-size:10px;letter-spacing:.08em;padding-top:2px}
+.step span{color:var(--ink-2);font-size:13px;line-height:1.7}
+.note{margin:20px 0 0;padding:14px 18px;border-left:2px solid var(--accent);background:var(--bg-alt);color:var(--muted);font-size:12px;line-height:1.75}
+.note b{color:var(--ink-2);font-weight:500}
+.note.warn{border-left-color:#a47632}
+.table-wrap{margin:20px 0 0;overflow-x:auto;border-top:1px solid var(--hair)}
+table{width:100%;min-width:640px;border-collapse:collapse;font-size:12px}
+th,td{padding:11px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--hair-soft)}
+th{color:var(--muted-2);font-size:9px;font-weight:600;letter-spacing:.09em;white-space:nowrap}
+td{color:var(--muted);line-height:1.65}
+td b{color:var(--ink-2);font-weight:500}
+.plain-list{margin:16px 0 0;padding:0;list-style:none}
+.plain-list li{padding:9px 0;border-bottom:1px solid var(--hair-soft);color:var(--muted);font-size:13px;line-height:1.7}
+.plain-list li b{color:var(--ink-2);font-weight:500}
+.links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px}
+.links a{color:var(--accent);font-size:12px;font-weight:500}
+.links a:hover{color:var(--ink)}
+.faq{display:grid;margin-top:18px;border-top:1px solid var(--hair-soft)}
+details{border-bottom:1px solid var(--hair-soft);padding:15px 0}
+summary{display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer;color:var(--ink-2);font-size:13px;font-weight:500;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";flex:0 0 auto;color:var(--muted-2);font-size:16px;font-weight:400;transition:transform .2s var(--ease)}
+details[open] summary:after{transform:rotate(45deg)}
+details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line-height:1.75}
+.sha-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding:12px 0;border-top:1px solid var(--hair-soft);border-bottom:1px solid var(--hair-soft)}
+.sha-line span{color:var(--muted-2);font-size:9px;font-weight:600;letter-spacing:.09em}
+.sha-line code{flex:1;min-width:220px;background:transparent;font-size:10px;word-break:break-all;padding:0}
+.copy{border:0;background:transparent;color:var(--accent);font-size:10px;font-weight:500;cursor:pointer;padding:4px 0}
+.copy:hover{color:var(--ink)}
+
+/* ===== 页脚 ===== */
+.footer{background:var(--bg);border-top:1px solid var(--hair-soft)}
+.footer-main{display:grid;grid-template-columns:1.25fr 2.75fr;gap:64px;padding:46px 0 34px}
+.footer-brand{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;letter-spacing:-.02em}
+.footer-brand img{width:23px;height:23px}
+.footer-brand small{display:block;margin-top:2px;color:var(--muted-2);font-size:8px;letter-spacing:.14em;font-weight:500}
+.footer-about{margin:17px 0 0;max-width:330px;color:var(--muted);font-size:11px;line-height:1.75}
+.footer-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.footer-col h3{margin:0 0 12px;font-size:11px;font-weight:600;color:var(--ink-2)}
+.footer-col a{display:block;padding:4px 0;color:var(--muted);font-size:11px;transition:color .16s var(--ease)}
+.footer-col a:hover{color:var(--ink)}
+.footer-legal{border-top:1px solid var(--hair-soft);padding:18px 0 27px;color:var(--muted-2);font-size:11px;line-height:1.75}
+.footer-legal p{margin:0 0 8px}
+.footer-bottom{display:flex;justify-content:space-between;gap:18px;padding-top:13px;border-top:1px solid var(--hair-soft);color:var(--muted-2);font-size:10px}
+.footer-bottom a{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:28px;z-index:1300;transform:translate(-50%,12px);opacity:0;pointer-events:none;padding:9px 14px;border-radius:999px;background:rgba(29,29,31,.94);color:#fff;font-size:11px;transition:opacity .22s var(--ease),transform .22s var(--ease)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
 @media(max-width:900px){
-  .hero{grid-template-columns:1fr;gap:24px;padding-top:42px}
-  .hero-stack{max-width:640px;transform:none}
-  .layout{grid-template-columns:1fr;gap:20px}
-  .toc{position:static}
+  :root{--nav-h:52px}
   .nav-links{display:none}
+  .menu-toggle{display:flex}
+  .mobile-menu{display:block}
+  .hero{padding-top:calc(var(--nav-h) + 60px)}
+  .hero-grid{grid-template-columns:1fr;gap:34px}
+  .guide-meta{max-width:520px}
+  .guide-layout{grid-template-columns:minmax(0,1fr);gap:34px;padding-top:20px}
+  .toc{position:static;border-top:1px solid var(--hair);padding-top:14px;min-width:0}
+  .toc nav{display:flex;gap:18px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+  .toc nav::-webkit-scrollbar{display:none}
+  .toc nav a{white-space:nowrap;border-bottom:0;padding:8px 0;font-size:12px}
+  .toc-help,.toc-title{display:none}
+  .footer-main{grid-template-columns:1fr;gap:32px}
+  .footer-cols{max-width:720px}
 }
 @media(max-width:600px){
-  .wrap{width:calc(100% - 24px)}
-  h1{font-size:34px}
-  .hero-stack .two{grid-template-columns:1fr}
-  .card{padding:18px}
-  .btn{width:100%}
-  table{font-size:11px}
+  .wrap{width:calc(100% - 30px)}
+  .hero{padding-bottom:34px}
+  .hero h1{font-size:clamp(34px,9.2vw,48px);line-height:1.06}
+  .hero-lead{font-size:16px}
+  .hero-actions{flex-direction:column;align-items:stretch;gap:9px;margin-top:24px}
+  .hero-actions .btn,.hero-actions .text-link{justify-content:center}
+  .guide-visual{margin-top:36px}
+  .guide-visual img{border-radius:11px}
+  .guide-visual figcaption{display:block;font-size:9px}
+  .guide-visual figcaption span{display:block}
+  .guide-visual figcaption span:last-child{margin-top:2px}
+  .guide-layout{padding-bottom:70px}
+  .guide-section{padding-bottom:42px;margin-bottom:42px}
+  .guide-section h2{font-size:28px}
+  .guide-section > p{font-size:14px}
+  .step{grid-template-columns:30px 1fr;gap:10px}
+  .note{padding:13px 14px;font-size:11px}
+  table{font-size:11px;min-width:580px}
+  details p{font-size:11px}
+  .footer-cols{grid-template-columns:repeat(2,1fr);gap:22px 18px}
+  .footer-col a{font-size:11px}
+  .footer-bottom{display:block}
+  .footer-bottom span{display:block}
+  .footer-bottom span:last-child{margin-top:6px}
 }
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*:before,*:after{animation:none !important;transition:none !important}
+  .js .reveal{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
-<nav class="nav">
+<nav class="nav" id="nav" aria-label="主导航">
   <div class="wrap nav-inner">
-    <a class="brand" href="index.html"><span class="logo">N</span><span>Novae<small>USER GUIDE</small></span></a>
-    <div class="nav-links">
-      <a href="index.html">首页</a>
-      <a href="#start">开始</a>
+    <a class="brand" href="index.html" aria-label="Novae 首页">
+      <img src="assets/appicon-256.png" width="26" height="26" alt="">
+      <span>Novae</span>
+      <span class="brand-sub">USER GUIDE</span>
+    </a>
+    <div class="nav-links" aria-label="指南导航">
+      <a href="index.html">官网</a>
+      <a href="#start">安装</a>
       <a href="#login">登录</a>
       <a href="#soda">汽水整曲</a>
       <a href="#faq">排错</a>
     </div>
-    <a class="nav-cta" href="index.html#download">下载</a>
+    <div class="nav-actions">
+      <a class="nav-cta" href="index.html#download">下载</a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span>
+      </button>
+    </div>
   </div>
 </nav>
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <a href="index.html">官网 <small>HOME</small></a>
+  <a href="#start">安装与升级 <small>INSTALL</small></a>
+  <a href="#login">七个平台登录 <small>SIGN IN</small></a>
+  <a href="#soda">汽水会员整曲 <small>SODA</small></a>
+  <a href="#history">最近播放与队列 <small>HISTORY</small></a>
+  <a href="#scale">缩放与接口 <small>LAYOUT</small></a>
+  <a href="#faq">常见问题 <small>FAQ</small></a>
+</div>
 
-<header class="wrap hero">
-  <div class="reveal">
-    <div class="kicker">USER GUIDE · 1.4.0</div>
-    <h1>装好，登录，<br><em>然后只管听。</em></h1>
-    <p>这份指南覆盖安装、七个平台登录、汽水会员整曲、最近播放、播放队列、界面缩放、接口地址脱敏与常见问题。</p>
-    <div class="quick">
-      <a class="btn primary" href="https://github.com/TongWang0808/novae-releases/releases/latest" target="_blank" rel="noopener">下载最新版</a>
-      <a class="btn ghost" href="index.html">返回官网</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow reveal">Novae Support</p>
+        <h1 class="reveal" style="--delay:50ms">使用指南，<br>从第一次登录开始。</h1>
+        <p class="lead hero-lead reveal" style="--delay:100ms">安装、七个平台登录、汽水会员整曲、最近播放、播放队列、界面缩放与排错，都在这一页。</p>
+        <div class="hero-actions reveal" style="--delay:140ms">
+          <a class="btn primary" id="downloadLatest" href="https://github.com/TongWang0808/novae-releases/releases/latest" target="_blank" rel="noopener">下载最新版</a>
+          <a class="text-link" href="index.html">返回官网
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 6h8m0 0-3-3m3 3-3 3"/></svg>
+          </a>
+        </div>
+      </div>
+      <aside class="guide-meta reveal" style="--delay:80ms" aria-label="指南信息">
+        <div><span>VERSION</span><b id="guideVersion">1.4.0</b></div>
+        <div><span>PLATFORM</span><b>Windows 10 / 11 x64</b></div>
+        <div><span>UPDATED</span><b>2026-11-25</b></div>
+        <div><span>FORMAT</span><b>单文件 · 免安装</b></div>
+      </aside>
     </div>
-  </div>
-  <div class="hero-stack reveal" aria-hidden="true">
-    <img src="docs/readme-1.3.9/02-platforms.png" alt="七大平台账号中心" loading="lazy">
-    <div class="two">
-      <img src="docs/readme-1.3.9/07-appearance.png" alt="外观与缩放设置" loading="lazy">
-      <img src="docs/readme-1.3.9/10-motion.png" alt="沉浸光感与按压形变" loading="lazy">
-    </div>
+    <figure class="guide-visual reveal" style="--delay:160ms">
+      <img src="docs/readme-1.3.9/02-platforms.png" alt="Novae 七大平台账号中心使用界面" width="1280" height="800" fetchpriority="high">
+      <figcaption><span>账号中心 · 七个平台同时在线</span><span>Novae 1.4.0 实机界面</span></figcaption>
+    </figure>
   </div>
 </header>
 
-<div class="wrap layout">
+<div class="wrap guide-layout">
   <aside class="toc reveal">
-    <b>目录</b>
-    <a href="#start">安装与升级</a>
-    <a href="#login">七个平台登录</a>
-    <a href="#soda">汽水会员整曲</a>
-    <a href="#history">最近播放与队列</a>
-    <a href="#scale">缩放与接口地址</a>
-    <a href="#update">更新与校验</a>
-    <a href="#faq">常见问题</a>
+    <p class="toc-title">CONTENTS</p>
+    <nav aria-label="目录">
+      <a href="#start">安装与升级</a>
+      <a href="#login">七个平台登录</a>
+      <a href="#soda">汽水会员整曲</a>
+      <a href="#history">最近播放与队列</a>
+      <a href="#scale">缩放与接口地址</a>
+      <a href="#update">更新与校验</a>
+      <a href="#faq">常见问题</a>
+    </nav>
+    <p class="toc-help">遇到指南未覆盖的问题，可在 <a href="https://github.com/TongWang0808/novae-releases/issues" target="_blank" rel="noopener">GitHub Issues</a> 或反馈群中说明版本与复现步骤。</p>
   </aside>
 
-  <main class="content">
-    <section id="start" class="reveal">
+  <main class="guide-content">
+    <section class="guide-section reveal" id="start">
+      <div class="section-number">01 / INSTALL</div>
       <h2>安装与升级</h2>
+      <p>Novae 是一个单文件 Windows 应用。不需要安装器，也不会把用户数据写进程序目录。</p>
       <div class="steps">
-        <div class="step"><span>下载 <code>novae.exe</code>，建议放在一个固定目录，例如 <code>D:\Apps\Novae</code>。</span></div>
-        <div class="step"><span>直接替换旧版 <code>Novae.exe</code>。账号、登录态、歌单、最近播放与下载记录保存在 WebView2 用户目录，不会被覆盖。</span></div>
-        <div class="step"><span>首次启动如遇 Windows SmartScreen，点击“更多信息 → 仍要运行”。这是未购买代码签名证书时的正常提示。</span></div>
-        <div class="step"><span>启动后可在“设置 → 关于”查看版本；1.4.0 的文件版本与产品版本均为 <code>1.4.0.0</code>。</span></div>
+        <div class="step"><em>01</em><span>下载 <code>novae.exe</code>，建议放在一个固定目录，例如 <code>D:\Apps\Novae</code>。</span></div>
+        <div class="step"><em>02</em><span>直接替换旧版 <code>Novae.exe</code>。账号、登录态、歌单、最近播放与下载记录保存在 WebView2 用户目录，不会被覆盖。</span></div>
+        <div class="step"><em>03</em><span>首次启动如遇 Windows SmartScreen，点击“更多信息 → 仍要运行”。这是未购买代码签名证书时的正常提示。</span></div>
+        <div class="step"><em>04</em><span>启动后可在“设置 → 关于”查看版本；1.4.0 的文件版本与产品版本均为 <code>1.4.0.0</code>。</span></div>
       </div>
-      <div class="note">升级不需要卸载旧版，也不建议删除用户数据目录；直接替换 exe 是保留登录态与历史记录最稳妥的方式。</div>
+      <div class="note"><b>升级不需要卸载旧版。</b> 也不建议删除用户数据目录；直接替换 exe 是保留登录态与历史记录最稳妥的方式。</div>
     </section>
 
-    <section id="login" class="reveal">
+    <section class="guide-section reveal" id="login">
+      <div class="section-number">02 / ACCOUNTS</div>
       <h2>七个平台登录</h2>
       <p>打开“账号中心 → 添加账号”，选择平台后会显示该平台实际的“登录入口”。不同平台不能共用一套假登录，必须走各自官方入口。</p>
-      <table>
-        <tr><th>平台</th><th>登录入口</th><th>说明</th></tr>
-        <tr><td><b>QQ 音乐</b></td><td>网页登录 / QQ / 微信</td><td>扫码或账号授权后回读昵称、歌单、喜欢与最近播放。</td></tr>
-        <tr><td><b>酷狗音乐</b></td><td>扫码</td><td>网页 token 与 API 端不通用，扫码后由内置 KuGouMusicApi 同步。</td></tr>
-        <tr><td><b>酷我音乐</b></td><td>网页登录</td><td>内置接口直连，支持账号资料、喜欢与歌单。</td></tr>
-        <tr><td><b>网易云音乐</b></td><td>扫码 / 手机号</td><td>可只登录平台，也可额外配置云端 API。</td></tr>
-        <tr><td><b>华为音乐</b></td><td>网页登录</td><td>华为账号授权后同步歌单、喜欢与会员信息。</td></tr>
-        <tr><td><b>汽水音乐</b></td><td>扫码（主）/ 手机号验证码（备用）</td><td>遇到 2046 二次验证时，优先在官方验证宿主完成短信 / 滑块。</td></tr>
-        <tr><td><b>波点音乐</b></td><td>扫码</td><td>用波点 App 扫码；微信 / QQ / 手机号先在波点 App 内完成。</td></tr>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>平台</th><th>登录入口</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td><b>QQ 音乐</b></td><td>网页登录 / QQ / 微信</td><td>扫码或账号授权后回读昵称、歌单、喜欢与最近播放。</td></tr>
+            <tr><td><b>酷狗音乐</b></td><td>扫码</td><td>网页 token 与 API 端不通用，扫码后由内置 KuGouMusicApi 同步。</td></tr>
+            <tr><td><b>酷我音乐</b></td><td>网页登录</td><td>内置接口直连，支持账号资料、喜欢与歌单。</td></tr>
+            <tr><td><b>网易云音乐</b></td><td>扫码 / 手机号</td><td>可只登录平台，也可额外配置云端 API。</td></tr>
+            <tr><td><b>华为音乐</b></td><td>网页登录</td><td>华为账号授权后同步歌单、喜欢与会员信息。</td></tr>
+            <tr><td><b>汽水音乐</b></td><td>扫码（主）/ 手机号验证码（备用）</td><td>遇到 2046 二次验证时，优先在官方验证宿主完成短信 / 滑块。</td></tr>
+            <tr><td><b>波点音乐</b></td><td>扫码</td><td>用波点 App 扫码；微信 / QQ / 手机号先在波点 App 内完成。</td></tr>
+          </tbody>
+        </table>
+      </div>
       <div class="note">汽水、波点不依赖外部音乐 API。登录会话只保存在本机；如果平台要求图形验证或风控校验，请改在官方 App 内完成。</div>
     </section>
 
-    <section id="soda" class="reveal">
+    <section class="guide-section reveal" id="soda">
+      <div class="section-number">03 / SODA MUSIC</div>
       <h2>汽水会员整曲</h2>
       <p>汽水 Web 接口对会员曲目只下发 30 秒试听。要播放完整整曲，Novae 需要 PC 端签名器，并对返回的 CENC MP4 做本地解密。</p>
-      <div class="card">
-        <h3>方式一：本机 SodaM signer</h3>
-        <p>安装并运行 SodaM 后，Novae 会读取 <code>%APPDATA%\sodam\config.json</code> 中的 <code>signer_url</code> 与 <code>signer_token</code>。不需要在 Novae 里重复填写。</p>
-        <h3>方式二：环境变量</h3>
-        <p>在启动 Novae 前设置：</p>
-        <p><code>QISHUI_SIGNER_URL</code> 与 <code>QISHUI_SIGNER_TOKEN</code>。适合把签名服务部署在另一台机器或容器里。</p>
-        <div class="note warn">没有签名器时，Novae 会自动回退到公开流或 30 秒试听，不会把加密容器直接交给播放器。签名 token 只在内存中使用，不写入日志。</div>
-      </div>
+      <h3>方式一：本机 SodaM signer</h3>
+      <p>安装并运行 SodaM 后，Novae 会读取 <code>%APPDATA%\sodam\config.json</code> 中的 <code>signer_url</code> 与 <code>signer_token</code>。不需要在 Novae 里重复填写。</p>
+      <h3>方式二：环境变量</h3>
+      <p>在启动 Novae 前设置 <code>QISHUI_SIGNER_URL</code> 与 <code>QISHUI_SIGNER_TOKEN</code>。适合把签名服务部署在另一台机器或容器里。</p>
+      <div class="note warn"><b>没有签名器时：</b> Novae 会自动回退到公开流或 30 秒试听，不会把加密容器直接交给播放器。签名 token 只在内存中使用，不写入日志。</div>
     </section>
 
-    <section id="history" class="reveal">
+    <section class="guide-section reveal" id="history">
+      <div class="section-number">04 / PLAYBACK</div>
       <h2>最近播放与播放队列</h2>
-      <h3>最近播放按“实际开播源”归属</h3>
+      <h3>最近播放，按实际开播源归属</h3>
       <p>播放会话创建时记录默认音源，实际开播只写一次。预加载、自动续播、切音质都不会重复插入；手动切到 API 源时归属切换。QQ、酷狗、网易云在开播后异步回写官方最近播放。</p>
-      <h3>播放队列固定 5 行</h3>
+      <h3>播放队列，固定五行</h3>
       <p>队列不再分页，也没有页码下拉框。完整列表一次展开，当前视口固定 5 行；第 6 首起由右侧滚动条承载。5 行高度按实际行高测量，兼容 90% / 100% / 110% / 125% / 150%。</p>
       <div class="note">沉浸模式下队列卡使用 90% <code>--bg-elevated</code> 实底，不再出现 64% 透明浮层透出背景的问题。</div>
     </section>
 
-    <section id="scale" class="reveal">
+    <section class="guide-section reveal" id="scale">
+      <div class="section-number">05 / LAYOUT</div>
       <h2>缩放与接口地址</h2>
       <h3>界面缩放</h3>
       <p>在“设置 → 外观 → 界面缩放”选择 90% / 100% / 110% / 125% / 150%。切换后当前页面立即按新档重排；低分辨率设备建议优先使用 90% / 100% / 110%。</p>
@@ -210,11 +376,12 @@ details p{margin:9px 0 0;font-size:12px}
       <div class="note">这是为了避免录屏、截图或远程协助时把内网 IP、端口和 API 地址直接暴露出去；需要修改时再点眼睛。</div>
     </section>
 
-    <section id="update" class="reveal">
+    <section class="guide-section reveal" id="update">
+      <div class="section-number">06 / UPDATE</div>
       <h2>更新与校验</h2>
       <p>应用内“检查更新”会读取 <code>latest.json</code> 或 <code>latest-gitee.json</code>，按当前网络选择 GitHub / Gitee 资产。旧版本 Release 文件全部保留，不会因为新版本发布而删除。</p>
       <p>手动校验可对比 SHA-256：</p>
-      <p><code>40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C</code></p>
+      <div class="sha-line"><span>SHA-256</span><code id="shaText">40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C</code><button class="copy" id="copySha" type="button">复制</button></div>
       <div class="links">
         <a href="https://github.com/TongWang0808/novae-releases/releases" target="_blank" rel="noopener">GitHub 全部版本</a>
         <a href="https://gitee.com/meiliwang0808/novae-releases/releases" target="_blank" rel="noopener">Gitee 全部版本</a>
@@ -223,7 +390,8 @@ details p{margin:9px 0 0;font-size:12px}
       </div>
     </section>
 
-    <section id="faq" class="reveal">
+    <section class="guide-section reveal" id="faq">
+      <div class="section-number">07 / HELP</div>
       <h2>常见问题</h2>
       <div class="faq">
         <details><summary>启动后白屏 / 页面空白</summary><p>确认系统已安装 WebView2 Runtime；如仍空白，删除缓存目录后重启。不要删除整个用户数据目录，否则登录态会丢失。</p></details>
@@ -240,21 +408,118 @@ details p{margin:9px 0 0;font-size:12px}
 
 <footer class="footer">
   <div class="wrap">
-    <p>Novae 为独立实现，与各音乐平台及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。本指南随 1.4.0 更新。</p>
+    <div class="footer-main">
+      <div>
+        <a class="footer-brand" href="index.html"><img src="assets/appicon-256.png" width="23" height="23" alt=""><span>Novae<small>DESKTOP MUSIC</small></span></a>
+        <p class="footer-about">为 Windows 桌面打造的多平台音乐播放器。独立实现，不内置音源、账号或会员凭据，不破解 DRM。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col"><h3>产品</h3><a href="index.html#features">特性</a><a href="index.html#gallery">界面</a><a href="index.html#update">更新日志</a><a href="index.html#download">下载</a></div>
+        <div class="footer-col"><h3>资源</h3><a href="usage.html">使用指南</a><a href="THIRD-PARTY-NOTICES.md">第三方声明</a><a href="README.md">README</a><a href="latest.json">更新清单</a></div>
+        <div class="footer-col"><h3>项目</h3><a href="https://github.com/TongWang0808/novae-releases" target="_blank" rel="noopener">GitHub 仓库</a><a href="https://gitee.com/meiliwang0808/novae-releases" target="_blank" rel="noopener">Gitee 镜像</a><a href="https://github.com/TongWang0808/novae-releases/releases" target="_blank" rel="noopener">全部版本</a></div>
+        <div class="footer-col"><h3>支持</h3><a href="https://github.com/TongWang0808/novae-releases/issues" target="_blank" rel="noopener">问题反馈</a><a href="https://gitee.com/meiliwang0808/novae-releases/issues" target="_blank" rel="noopener">Gitee 反馈</a><a href="LICENSE">MIT License</a></div>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <p>Novae 为独立实现，与各音乐平台及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。</p>
+      <p>本指南随 1.4.0 更新；若版本号或校验值与页面不一致，以应用内“关于”和 Release 资产为准。</p>
+    </div>
+    <div class="footer-bottom"><span>Copyright © 2026 Novae contributors.</span><span>Windows 10 / 11 · x64</span></div>
   </div>
 </footer>
+<div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
 
 <script>
 (() => {
   "use strict";
-  const observer = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+  const $ = (id) => document.getElementById(id);
+
+  const nav = $("nav");
+  const onScroll = () => nav.classList.toggle("scrolled", window.scrollY > 12);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  const menuToggle = $("menuToggle");
+  const mobileMenu = $("mobileMenu");
+  function setMenu(open) {
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+    mobileMenu.classList.toggle("open", open);
+    mobileMenu.setAttribute("aria-hidden", String(!open));
+    document.body.classList.toggle("menu-open", open);
+  }
+  menuToggle.addEventListener("click", () => setMenu(menuToggle.getAttribute("aria-expanded") !== "true"));
+  mobileMenu.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenu(false)));
+  window.addEventListener("resize", () => { if (window.innerWidth > 900) setMenu(false); });
+
+  const revealObserver = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
     for (const entry of entries) {
-      if (entry.isIntersecting) { entry.target.classList.add("in"); observer.unobserve(entry.target); }
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-in");
+        revealObserver.unobserve(entry.target);
+      }
     }
-  }, { threshold: .12 }) : null;
-  document.querySelectorAll(".reveal").forEach((node, i) => {
-    node.style.transitionDelay = Math.min(i % 5, 3) * 40 + "ms";
-    if (observer) observer.observe(node); else node.classList.add("in");
+  }, { threshold: .08, rootMargin: "0px 0px -5% 0px" }) : null;
+  document.querySelectorAll(".reveal").forEach((node, index) => {
+    if (!node.style.getPropertyValue("--delay")) node.style.setProperty("--delay", Math.min(index % 5, 4) * 45 + "ms");
+    if (revealObserver) revealObserver.observe(node); else node.classList.add("is-in");
+  });
+
+  /* 当前章节高亮 */
+  const sections = [...document.querySelectorAll(".guide-content section[id]")];
+  const tocLinks = [...document.querySelectorAll(".toc nav a")];
+  let ticking = false;
+  function updateToc() {
+    const probe = 150;
+    let active = sections[0] && sections[0].id;
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= probe) active = section.id;
+    }
+    tocLinks.forEach((link) => link.setAttribute("aria-current", String(link.getAttribute("href") === "#" + active)));
+    ticking = false;
+  }
+  window.addEventListener("scroll", () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(updateToc); }
+  }, { passive: true });
+  updateToc();
+
+  /* 版本信息 */
+  async function loadLatest() {
+    try {
+      const res = await fetch("latest.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      const version = String(data.version || "").trim();
+      const asset = data.assets && data.assets["windows-amd64"];
+      if (version) {
+        $("guideVersion").textContent = version;
+        document.title = "Novae " + version + " 使用指南 - 安装、登录与播放";
+      }
+      if (asset && asset.url) {
+        $("downloadLatest").href = asset.url;
+      }
+      if (asset && asset.sha256) {
+        $("shaText").textContent = String(asset.sha256).toUpperCase();
+      }
+    } catch (err) {}
+  }
+  loadLatest();
+
+  const toast = $("toast");
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add("show");
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1700);
+  }
+  $("copySha").addEventListener("click", async () => {
+    const sha = $("shaText").textContent.trim();
+    try {
+      await navigator.clipboard.writeText(sha);
+      showToast("SHA-256 已复制");
+    } catch (err) {
+      showToast("复制失败，请手动选择");
+    }
   });
 })();
 </script>
