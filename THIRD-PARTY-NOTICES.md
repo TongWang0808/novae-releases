@@ -1,8 +1,8 @@
 # Novae 第三方开源声明
 
-更新日期：2026-11-24
+更新日期：2026-11-25
 
-适用版本：Novae 1.3.9（Windows x64）
+适用版本：Novae 1.4.0（Windows x64）
 
 Novae 本体采用 MIT License，见仓库根目录 `LICENSE`。本文件列出 Novae 在产品中实际使用、参考或分发的第三方项目及许可证信息。
 

@@ -5,26 +5,25 @@
 Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端。华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐、汽水音乐与波点音乐可以同时登录、随时切换；也可以不登录任何平台，只接一个自建或公开的云端音源。
 
 [![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0b1220?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/latest)
-[![Version](https://img.shields.io/badge/version-1.3.9-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.3.9)
+[![Version](https://img.shields.io/badge/version-1.4.0-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
 [下载最新版](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 镜像](https://gitee.com/meiliwang0808/novae-releases/releases/latest) · [官网](https://tongwang0808.github.io/novae-releases/) · [更新清单](https://github.com/TongWang0808/novae-releases/blob/main/latest.json)
 
 > 本项目为独立实现，与华为、腾讯、网易、酷狗、酷我、抖音/汽水及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。
 
-## 1.3.9 更新摘要
+## 1.4.0 更新摘要
 
-这是一个以 **汽水音乐 / 波点音乐原生接入**、**最近播放归属重做** 和 **全缩放界面收口** 为主的大版本。
+这是一个以 **QQ / 微信登录链路修复**、**七平台登录自动关窗** 和 **今日精选交互修正** 为主的稳定版，同时把沉浸光感五档参数对齐沐语 2.0。
 
-- **汽水音乐正式接入**：应用内扫码登录、官方二次验证宿主、手机号验证码备用入口；支持账号资料、会员信息、歌单、搜索、歌词、歌手、播放与最近播放。
-- **汽水会员整曲链路**：读取本机 SodaM signer 或 `QISHUI_SIGNER_URL` / `QISHUI_SIGNER_TOKEN`，对 PC 端 CENC MP4 解密后本地代理播放；完整流优先于 30 秒试听。
-- **波点音乐正式接入**：应用内扫码登录，支持会员到期时间、歌单、搜索、歌词、歌手介绍、喜欢与最近播放。
-- **最近播放归属重做**：按实际开播的默认音源归属，预加载、续播、切音质不重复写入；QQ、酷狗、网易云可异步回写官方最近播放。
-- **播放队列重做**：取消分页与页码下拉框，完整列表一次展开；当前固定显示 5 行，第 6 首起由右侧滚动条承载，全档缩放按真实行高测量。
-- **账号中心与设置收口**：账号详情明确显示“登录入口”；账号页 Hero 与平台卡统一表面参数；设置页接口地址默认完整脱敏，点击眼睛按钮才显示真实地址并允许编辑。
-- **全缩放适配**：90% / 100% / 110% / 125% / 150% 五档重新适配；推荐页按逻辑宽度重排，窄档不再出现“孤儿卡”和被裁按钮。
+- **QQ / 微信官方授权**：改用官方音乐 OAuth 独立入口，扫码后直接回到 Novae；修复登录成功但应用一直等待、微信提示 Cookie 不完整的问题。
+- **微信头像修复**：读取 QQ 音乐官方资料头像，不再显示默认企鹅图，也不会被兜底头像覆盖。
+- **七平台自动关窗**：华为、QQ、微信、网易云、酷我登录后自动关闭官方窗口；酷狗、汽水、波点扫码后自动收起登录面板。
+- **登录稳定性**：修复连续登录时回调资源泄漏导致主程序退出的问题；5000 次窗口枚举压力测试通过。
+- **今日精选**：歌曲条播放按钮固定在条目内部右侧，尺寸对齐“本周热听”，歌曲时长显示在按钮左侧。
+- **沉浸光感五档**：厚度、模糊、按压恢复为沐语 2.0 原始参数，档位名称统一为超薄 / 薄 / 常规 / 厚 / 超厚。
 
-完整说明见 [v1.3.9 Release](https://github.com/TongWang0808/novae-releases/releases/tag/v1.3.9)。
+完整说明见 [v1.4.0 Release](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)。
 
 ## 界面
 
@@ -85,6 +84,16 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 版本日志
 
+### 1.4.0（2026-11-25）
+
+- QQ 音乐的 QQ、微信扫码改用官方音乐 OAuth 独立入口；修复扫码成功后 Novae 一直等待、微信提示 Cookie 不完整。
+- 微信账号读取官方资料头像，不再显示默认企鹅图，也不会被兜底头像覆盖。
+- 华为、QQ、微信、网易云、酷我登录完成后自动关闭官方窗口；酷狗、汽水、波点扫码后自动收起登录面板。
+- 修复连续登录时回调资源泄漏导致主程序退出的问题；5000 次窗口枚举压力测试通过。
+- 今日精选歌曲条改用条目内部右侧播放按钮，尺寸对齐“本周热听”，时长显示在按钮左侧。
+- 沉浸光感五档厚度、模糊、按压恢复为沐语 2.0 原始参数，档位名称统一为超薄 / 薄 / 常规 / 厚 / 超厚。
+- 七平台、八份登录会话实机验证通过，登录完成后无残留官方窗口。
+
 ### 1.3.9（2026-11-24）
 
 - 新增汽水音乐内置客户端：扫码登录、2046 官方二次验证宿主、手机号验证码备用入口、账号 ID 回读校验。
@@ -112,15 +121,15 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 下载与校验
 
-- 版本：**1.3.9**（Windows 文件版本 / 产品版本 `1.3.9.0`）
+- 版本：**1.4.0**（Windows 文件版本 / 产品版本 `1.4.0.0`）
 - 安装包：`novae.exe`
-- 大小：`53,446,144` 字节
-- SHA-256：`58F92812C2423FF9EC904418F28D853B3337C19679A693EDCF7215B059CB7CD2`
-- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.3.9>
-- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.3.9>
+- 大小：`53,440,512` 字节
+- SHA-256：`40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C`
+- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0>
+- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.0>
 
 ```text
-58F92812C2423FF9EC904418F28D853B3337C19679A693EDCF7215B059CB7CD2  novae.exe
+40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C  novae.exe
 ```
 
 ## 安装
