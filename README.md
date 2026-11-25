@@ -5,25 +5,26 @@
 Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端。华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐、汽水音乐与波点音乐可以同时登录、随时切换；也可以不登录任何平台，只接一个自建或公开的云端音源。
 
 [![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0b1220?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/latest)
-[![Version](https://img.shields.io/badge/version-1.4.0-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)
+[![Version](https://img.shields.io/badge/version-1.4.1-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.1)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
 [下载最新版](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 镜像](https://gitee.com/meiliwang0808/novae-releases/releases/latest) · [官网](https://tongwang0808.github.io/novae-releases/) · [更新清单](https://github.com/TongWang0808/novae-releases/blob/main/latest.json)
 
 > 本项目为独立实现，与华为、腾讯、网易、酷狗、酷我、抖音/汽水及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。
 
-## 1.4.0 更新摘要
+## 1.4.1 更新摘要
 
-这是一个以 **QQ / 微信登录链路修复**、**七平台登录自动关窗** 和 **今日精选交互修正** 为主的稳定版，同时重新校准沉浸光感五档的厚度、模糊与按压参数。
+这是一个以 **会员状态真实性、微信账号判定、搜索联想图片化与播放界面细节** 为主的修正版。
 
-- **QQ / 微信官方授权**：改用官方音乐 OAuth 独立入口，扫码后直接回到 Novae；修复登录成功但应用一直等待、微信提示 Cookie 不完整的问题。
-- **微信头像修复**：读取 QQ 音乐官方资料头像，不再显示默认企鹅图，也不会被兜底头像覆盖。
-- **七平台自动关窗**：华为、QQ、微信、网易云、酷我登录后自动关闭官方窗口；酷狗、汽水、波点扫码后自动收起登录面板。
-- **登录稳定性**：修复连续登录时回调资源泄漏导致主程序退出的问题；5000 次窗口枚举压力测试通过。
-- **今日精选**：歌曲条播放按钮固定在条目内部右侧，尺寸对齐“本周热听”，歌曲时长显示在按钮左侧。
-- **沉浸光感五档**：厚度、模糊与按压参数重新校准，档位名称统一为超薄 / 薄 / 常规 / 厚 / 超厚。
+- **会员状态只认官方当前有效权益**：历史 VIP 标记、旧 Cookie 和失败响应不再把非会员变成会员；缺少有效字段时显示“会员信息待核实”。
+- **华为 / 酷狗 / 酷我**：修正华为历史会员误判、酷狗会员字段串扰与酷我提前跳过会员查询；8 个当前会话均已用官方接口核验。
+- **微信账号**：统一 QQ / 微信用户 ID 与音乐票据识别，长数字微信 ID 不再误报 Cookie 不完整，现有会话无需重新扫码。
+- **搜索联想**：类型文字改为歌曲封面、圆形歌手头像与专辑封面；歌手头像缺失时按平台补取，不借用歌曲图。
+- **准星与歌词页**：准星跟随 12 套主题强调色；歌词展开 / 收起改为对称 420ms 帘子过渡，消除页面颤抖与播放条残影。
+- **本周热听**：“10首·酷狗音乐”说明紧跟标题显示。
+- **启动与诊断**：启动提示支持“今日不再弹出”；新增 `crash.log` 与运行标记，异常退出可留下完整 panic 栈。
 
-完整说明见 [v1.4.0 Release](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)。
+1.4.0 的 QQ / 微信官方授权、七平台自动关窗、今日精选与沉浸光感五档保持不变，可查看 [v1.4.0 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)。
 
 ## 界面
 
@@ -84,6 +85,18 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 版本日志
 
+### 1.4.1（2026-11-25）
+
+- 会员状态改为只认各平台官方当前有效权益；历史 VIP 标记、旧 Cookie、失败或空响应不再覆盖已核实结果。
+- 修正华为音乐把 `hadVIPs.vipFlag` 当成当前会员的问题，现按有效 `subInfos` 判断。
+- 修正酷狗会员字段递归串扰，改为账号根字段优先；酷我补上官方会员查询并移除提前返回。
+- QQ / 微信统一用户 ID 与音乐票据识别，修复微信已登录却提示 Cookie 不完整。
+- 搜索联想改为歌曲封面、圆形歌手头像与专辑封面，歌手头像按平台补取。
+- 准星图标跟随 12 套主题强调色；歌词展开 / 收起改为对称 420ms 过渡，修复页面颤抖与播放条残影。
+- “本周热听”说明紧跟标题；启动提示支持“今日不再弹出”。
+- 新增 `crash.log` 与运行标记，记录未处理 panic 与上次异常退出信息。
+- 8 个现有会话的会员状态经官方接口核验；主包与 internal 测试通过，正式包文件版本 `1.4.1.0`。
+
 ### 1.4.0（2026-11-25）
 
 - QQ 音乐的 QQ、微信扫码改用官方音乐 OAuth 独立入口；修复扫码成功后 Novae 一直等待、微信提示 Cookie 不完整。
@@ -121,15 +134,15 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 下载与校验
 
-- 版本：**1.4.0**（Windows 文件版本 / 产品版本 `1.4.0.0`）
+- 版本：**1.4.1**（Windows 文件版本 / 产品版本 `1.4.1.0`）
 - 安装包：`novae.exe`
-- 大小：`53,440,512` 字节
-- SHA-256：`40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C`
-- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0>
-- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.0>
+- 大小：`53,487,616` 字节
+- SHA-256：`7C3D676C125C8E0CEE1D00DC0CE3692E19CF7CE79A35EE45F9D5EB4EF7500B3E`
+- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.1>
+- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.1>
 
 ```text
-40321848B611B164B152B1DC921896202FB44078488104E52F0E1AC21C0E532C  novae.exe
+7C3D676C125C8E0CEE1D00DC0CE3692E19CF7CE79A35EE45F9D5EB4EF7500B3E  novae.exe
 ```
 
 ## 安装
