@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="assets/favicon-48.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
-<link rel="preload" as="image" href="assets/screens/01-recommend.webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/screens/01-recommend.webp" imagesrcset="assets/screens/960/01-recommend.webp 960w, assets/screens/01-recommend.webp 1651w" imagesizes="(max-width: 840px) calc(100vw - 30px), 1100px" fetchpriority="high">
 <link rel="manifest" href="site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="zh_CN">
@@ -553,7 +553,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
     </div>
     <figure class="hero-stage reveal" style="--delay:300ms">
       <div class="hero-window">
-        <img src="assets/screens/01-recommend.webp" alt="Novae 推荐页，包含每日专辑、音乐盲盒、今日精选与本周热听" width="1651" height="997" fetchpriority="high">
+        <img src="assets/screens/01-recommend.webp" srcset="assets/screens/960/01-recommend.webp 960w, assets/screens/01-recommend.webp 1651w" sizes="(max-width: 840px) calc(100vw - 30px), 1100px" alt="Novae 推荐页，包含每日专辑、音乐盲盒、今日精选与本周热听" width="1651" height="997" fetchpriority="high">
       </div>
       <figcaption class="hero-caption"><span>推荐页 · 音乐盲盒 · 今日精选 · 本周热听</span><span>Novae 1.4.0 实机界面</span></figcaption>
     </figure>
@@ -599,7 +599,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual reveal" style="--delay:80ms">
-          <img src="assets/screens/02-platforms.webp" alt="Novae 七大平台账号中心" width="1651" height="997" loading="lazy">
+          <img src="assets/screens/02-platforms.webp" srcset="assets/screens/960/02-platforms.webp 960w, assets/screens/02-platforms.webp 1651w" sizes="(max-width: 840px) calc(100vw - 30px), 540px" alt="Novae 七大平台账号中心" width="1651" height="997" loading="lazy">
           <figcaption>七大平台，一个账号中心</figcaption>
         </figure>
       </div>
@@ -616,7 +616,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual dark-image reveal" style="--delay:80ms">
-          <img src="assets/screens/08-immersive.webp" alt="Novae 大屏沉浸播放界面" width="1651" height="997" loading="lazy">
+          <img src="assets/screens/08-immersive.webp" srcset="assets/screens/960/08-immersive.webp 960w, assets/screens/08-immersive.webp 1651w" sizes="(max-width: 840px) calc(100vw - 30px), 540px" alt="Novae 大屏沉浸播放界面" width="1651" height="997" loading="lazy">
           <figcaption>大屏播放，沉浸其中</figcaption>
         </figure>
       </div>
@@ -633,7 +633,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
           </div>
         </div>
         <figure class="feature-visual reveal" style="--delay:80ms">
-          <img src="assets/screens/10-motion.webp" alt="Novae 沉浸光感、主题与按压形变设置" width="1651" height="997" loading="lazy">
+          <img src="assets/screens/10-motion.webp" srcset="assets/screens/960/10-motion.webp 960w, assets/screens/10-motion.webp 1467w" sizes="(max-width: 840px) calc(100vw - 30px), 540px" alt="Novae 沉浸光感、主题与按压形变设置" width="1651" height="997" loading="lazy">
           <figcaption>沉浸光感，按压形变</figcaption>
         </figure>
       </div>
@@ -672,7 +672,7 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
       <div class="showcase-stage">
         <div class="showcase-media reveal">
           <div class="showcase-frame" id="showcaseFrame">
-            <img id="showcaseImage" src="assets/screens/01-recommend.webp" alt="推荐页与音乐盲盒" width="1651" height="997" loading="lazy">
+            <img id="showcaseImage" src="assets/screens/01-recommend.webp" srcset="assets/screens/960/01-recommend.webp 960w, assets/screens/01-recommend.webp 1651w" sizes="(max-width: 980px) calc(100vw - 30px), 785px" alt="推荐页与音乐盲盒" width="1651" height="997" loading="lazy">
           </div>
           <div class="showcase-controls">
             <button class="round-btn" id="prevSlide" type="button" aria-label="上一张截图">
@@ -976,12 +976,15 @@ h3{font-size:clamp(30px,3.5vw,45px);line-height:1.1}
     current = (index + thumbs.length) % thumbs.length;
     const thumb = thumbs[current];
     const nextSrc = thumb.dataset.src || thumb.querySelector("img").src;
+    const nextMid = nextSrc.replace("/screens/", "/screens/960/");
     const nextAlt = thumb.dataset.title;
     thumbs.forEach((item, i) => item.setAttribute("aria-current", String(i === current)));
     window.clearTimeout(switchTimer);
 
     const apply = () => {
       image.src = nextSrc;
+      image.srcset = nextMid + " 960w, " + nextSrc + " 1600w";
+      image.sizes = "(max-width: 980px) calc(100vw - 30px), 785px";
       image.alt = nextAlt;
       title.textContent = thumb.dataset.title;
       desc.textContent = thumb.dataset.desc;
