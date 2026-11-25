@@ -5,26 +5,24 @@
 Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端。华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐、汽水音乐与波点音乐可以同时登录、随时切换；也可以不登录任何平台，只接一个自建或公开的云端音源。
 
 [![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0b1220?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/latest)
-[![Version](https://img.shields.io/badge/version-1.4.1-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.1)
+[![Version](https://img.shields.io/badge/version-1.4.2-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.2)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
 [下载最新版](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 镜像](https://gitee.com/meiliwang0808/novae-releases/releases/latest) · [官网](https://tongwang0808.github.io/novae-releases/) · [更新清单](https://github.com/TongWang0808/novae-releases/blob/main/latest.json)
 
 > 本项目为独立实现，与华为、腾讯、网易、酷狗、酷我、抖音/汽水及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。
 
-## 1.4.1 更新摘要
+## 1.4.2 更新摘要
 
-这是一个以 **会员状态真实性、微信账号判定、搜索联想图片化与播放界面细节** 为主的修正版。
+这是一个以 **网易云登录态真实性、设置页整体缩放与关闭确认** 为主的修正版，同时纳入近期接口诊断与隐私加固。
 
-- **会员状态只认官方当前有效权益**：历史 VIP 标记、旧 Cookie 和失败响应不再把非会员变成会员；缺少有效字段时显示“会员信息待核实”。
-- **华为 / 酷狗 / 酷我**：修正华为历史会员误判、酷狗会员字段串扰与酷我提前跳过会员查询；8 个当前会话均已用官方接口核验。
-- **微信账号**：统一 QQ / 微信用户 ID 与音乐票据识别，长数字微信 ID 不再误报 Cookie 不完整，现有会话无需重新扫码。
-- **搜索联想**：类型文字改为歌曲封面、圆形歌手头像与专辑封面；歌手头像缺失时按平台补取，不借用歌曲图。
-- **准星与歌词页**：准星跟随 12 套主题强调色；歌词展开 / 收起改为对称 420ms 帘子过渡，消除页面颤抖与播放条残影。
-- **本周热听**：“10首·酷狗音乐”说明紧跟标题显示。
-- **启动与诊断**：启动提示支持“今日不再弹出”；新增 `crash.log` 与运行标记，异常退出可留下完整 panic 栈。
+- **网易云登录状态不再误报**：账号资料和会员状态直连网易云官方接口；本机 `localhost:3000` 云端 API 未启动时，不再把账号标成“登录已失效”。只有官方明确返回 `301` / `401` 或 Cookie 缺失时才判失效；连接失败、超时与临时 `403` 只显示“暂时无法检查”。
+- **账号与音源解耦**：云端 API 继续负责搜索、播放、歌词与封面兜底，账号登录态不再依赖它；API 没开时账号页仍能显示昵称、头像、会员和到期时间。
+- **请求错误脱敏**：网络错误不再把带 `MUSIC_U` 的完整 URL 写入日志或错误文案。
+- **设置页整体缩放**：设置页改为 **940 × 600** 的完整构图，按窗口可用宽高整体缩放；窄窗口不再压列宽、挤按钮或让下拉框越界。
+- **弹窗与关闭确认**：隐私弹窗同步 940 × 600，QQ 群二维码 220px；关闭确认按 420 × 400 设计上限缩放，每次关闭都确认，并移除“记住选择、下次不再询问”。
 
-1.4.0 的 QQ / 微信官方授权、七平台自动关窗、今日精选与沉浸光感五档保持不变，可查看 [v1.4.0 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.0)。
+1.4.1 的会员状态真实性、微信账号判定、搜索联想图片化、准星主题化、歌词过渡与启动诊断保持不变，可查看 [v1.4.1 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.1)。
 
 ## 界面
 
@@ -85,6 +83,16 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 版本日志
 
+### 1.4.2（2026-11-25）
+
+- 网易云账号资料与会员状态改为直连官方接口，不再依赖本机 `localhost:3000` 云端 API；连接失败不再误报登录失效。
+- 网络失败、超时与临时 `403` 只显示“暂时无法检查”；仅官方 `301` / `401` 或 Cookie 缺失才要求重新登录。
+- 网络错误隐藏带 `MUSIC_U` 的请求 URL，避免 Cookie 写入日志。
+- 设置页改为 940 × 600 完整构图，按窗口可用宽高整体缩放；下拉菜单限制在设置面板内。
+- 隐私弹窗同步 940 × 600，QQ 群二维码 220px；关闭确认按 420 × 400 设计上限缩放。
+- 每次关闭窗口都弹确认，移除“记住选择、下次不再询问”；设置文案只决定默认去向。
+- 主包与 internal 测试通过；正式包文件版本 `1.4.2.0`。
+
 ### 1.4.1（2026-11-25）
 
 - 会员状态改为只认各平台官方当前有效权益；历史 VIP 标记、旧 Cookie、失败或空响应不再覆盖已核实结果。
@@ -134,15 +142,15 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 下载与校验
 
-- 版本：**1.4.1**（Windows 文件版本 / 产品版本 `1.4.1.0`）
+- 版本：**1.4.2**（Windows 文件版本 / 产品版本 `1.4.2.0`）
 - 安装包：`novae.exe`
-- 大小：`53,487,616` 字节
-- SHA-256：`7C3D676C125C8E0CEE1D00DC0CE3692E19CF7CE79A35EE45F9D5EB4EF7500B3E`
-- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.1>
-- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.1>
+- 大小：`53,494,784` 字节
+- SHA-256：`77299029879B60A62526903A2D1E03E1AD93FA89BD6F6860248610515ECD735D`
+- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.2>
+- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.2>
 
 ```text
-7C3D676C125C8E0CEE1D00DC0CE3692E19CF7CE79A35EE45F9D5EB4EF7500B3E  novae.exe
+77299029879B60A62526903A2D1E03E1AD93FA89BD6F6860248610515ECD735D  novae.exe
 ```
 
 ## 安装
@@ -151,7 +159,7 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 2. 直接替换旧版 `Novae.exe`，用户数据、登录态、歌单与下载记录保留在原有 WebView2 用户目录。
 3. 首次启动如遇 Windows SmartScreen，选择“更多信息 → 仍要运行”。
 4. 汽水会员整曲需本机 SodaM signer 或设置 `QISHUI_SIGNER_URL` / `QISHUI_SIGNER_TOKEN`；未配置时自动回退公开流或试听。
-5. 高缩放档在“设置 → 外观 → 界面缩放”切换，切换后当前页面立即按新档重排。
+5. 高缩放档在“设置 → 外观 → 界面缩放”切换；推荐页与账号页按逻辑宽度重排，设置页与弹窗按完整构图整体缩放。
 
 ## 第三方与许可
 

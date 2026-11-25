@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Novae 使用指南 - 安装、登录与播放</title>
-<meta name="description" content="Novae 1.4.1 使用指南：安装、七个平台登录、汽水 signer、最近播放、播放队列、界面缩放、接口地址与常见问题。">
+<meta name="description" content="Novae 1.4.2 使用指南：安装、七个平台登录、汽水 signer、最近播放、播放队列、界面缩放、接口地址与常见问题。">
 <meta name="theme-color" content="#fbfbfd">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://tongwang0808.github.io/novae-releases/usage.html">
@@ -283,7 +283,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
         </div>
       </div>
       <aside class="guide-meta reveal" style="--delay:80ms" aria-label="指南信息">
-        <div><span>VERSION</span><b id="guideVersion">1.4.1</b></div>
+        <div><span>VERSION</span><b id="guideVersion">1.4.2</b></div>
         <div><span>PLATFORM</span><b>Windows 10 / 11 x64</b></div>
         <div><span>UPDATED</span><b>2026-11-25</b></div>
         <div><span>FORMAT</span><b>单文件 · 免安装</b></div>
@@ -291,7 +291,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
     </div>
     <figure class="guide-visual reveal" style="--delay:160ms">
       <img src="assets/screens/02-platforms.webp" srcset="assets/screens/960/02-platforms.webp 960w, assets/screens/02-platforms.webp 1651w" sizes="(max-width: 900px) calc(100vw - 30px), 1080px" alt="Novae 七大平台账号中心使用界面" width="1651" height="997" fetchpriority="high">
-      <figcaption><span>账号中心 · 七个平台同时在线</span><span>Novae 1.4.1 实机界面</span></figcaption>
+      <figcaption><span>账号中心 · 七个平台同时在线</span><span>Novae 1.4.2 实机界面</span></figcaption>
     </figure>
   </div>
 </header>
@@ -320,7 +320,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
         <div class="step"><em>01</em><span>下载 <code>novae.exe</code>，建议放在一个固定目录，例如 <code>D:\Apps\Novae</code>。</span></div>
         <div class="step"><em>02</em><span>直接替换旧版 <code>Novae.exe</code>。账号、登录态、歌单、最近播放与下载记录保存在 WebView2 用户目录，不会被覆盖。</span></div>
         <div class="step"><em>03</em><span>首次启动如遇 Windows SmartScreen，点击“更多信息 → 仍要运行”。这是未购买代码签名证书时的正常提示。</span></div>
-        <div class="step"><em>04</em><span>启动后可在“设置 → 关于”查看版本；1.4.1 的文件版本与产品版本均为 <code>1.4.1.0</code>。</span></div>
+        <div class="step"><em>04</em><span>启动后可在“设置 → 关于”查看版本；1.4.2 的文件版本与产品版本均为 <code>1.4.2.0</code>。</span></div>
       </div>
       <div class="note"><b>升级不需要卸载旧版。</b> 也不建议删除用户数据目录；直接替换 exe 是保留登录态与历史记录最稳妥的方式。</div>
     </section>
@@ -336,7 +336,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
             <tr><td><b>QQ 音乐</b></td><td>网页登录 / QQ / 微信</td><td>扫码或账号授权后回读昵称、歌单、喜欢与最近播放。</td></tr>
             <tr><td><b>酷狗音乐</b></td><td>扫码</td><td>网页 token 与 API 端不通用，扫码后由内置 KuGouMusicApi 同步。</td></tr>
             <tr><td><b>酷我音乐</b></td><td>网页登录</td><td>内置接口直连，支持账号资料、喜欢与歌单。</td></tr>
-            <tr><td><b>网易云音乐</b></td><td>扫码 / 手机号</td><td>可只登录平台，也可额外配置云端 API。</td></tr>
+            <tr><td><b>网易云音乐</b></td><td>扫码 / 手机号</td><td>账号状态直连官方校验；云端 API 仅用于搜索 / 播放兜底。</td></tr>
             <tr><td><b>华为音乐</b></td><td>网页登录</td><td>华为账号授权后同步歌单、喜欢与会员信息。</td></tr>
             <tr><td><b>汽水音乐</b></td><td>扫码（主）/ 手机号验证码（备用）</td><td>遇到 2046 二次验证时，优先在官方验证宿主完成短信 / 滑块。</td></tr>
             <tr><td><b>波点音乐</b></td><td>扫码</td><td>用波点 App 扫码；微信 / QQ / 手机号先在波点 App 内完成。</td></tr>
@@ -371,7 +371,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
       <div class="section-number">05 / LAYOUT</div>
       <h2>缩放与接口地址</h2>
       <h3>界面缩放</h3>
-      <p>在“设置 → 外观 → 界面缩放”选择 90% / 100% / 110% / 125% / 150%。切换后当前页面立即按新档重排；低分辨率设备建议优先使用 90% / 100% / 110%。</p>
+      <p>在“设置 → 外观 → 界面缩放”选择 90% / 100% / 110% / 125% / 150%。推荐页、账号页等按逻辑宽度重排；设置页与隐私 / 关闭弹窗保持完整构图整体缩放，不再在窄窗口里压缩列宽。低分辨率设备建议优先使用 90% / 100% / 110%。</p>
       <h3>接口地址脱敏</h3>
       <p>设置页不会再明文显示真实地址。占位示例为 <code>xxx.xxx.xxx.xxx:xxx</code> 或 <code>http://xxx.xxx.xxx.xxx:xxx</code>；已配置地址默认完整脱敏并只读，点击右侧眼睛按钮才显示真实地址并允许编辑。账号卡里的“接口地址”使用同一套脱敏规则。</p>
       <div class="note">这是为了避免录屏、截图或远程协助时把内网 IP、端口和 API 地址直接暴露出去；需要修改时再点眼睛。</div>
@@ -382,7 +382,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
       <h2>更新与校验</h2>
       <p>应用内“检查更新”会读取 <code>latest.json</code> 或 <code>latest-gitee.json</code>，按当前网络选择 GitHub / Gitee 资产。旧版本 Release 文件全部保留，不会因为新版本发布而删除。</p>
       <p>手动校验可对比 SHA-256：</p>
-      <div class="sha-line"><span>SHA-256</span><code id="shaText">7C3D676C125C8E0CEE1D00DC0CE3692E19CF7CE79A35EE45F9D5EB4EF7500B3E</code><button class="copy" id="copySha" type="button">复制</button></div>
+      <div class="sha-line"><span>SHA-256</span><code id="shaText">77299029879B60A62526903A2D1E03E1AD93FA89BD6F6860248610515ECD735D</code><button class="copy" id="copySha" type="button">复制</button></div>
       <div class="links">
         <a href="https://github.com/TongWang0808/novae-releases/releases" target="_blank" rel="noopener">GitHub 全部版本</a>
         <a href="https://gitee.com/meiliwang0808/novae-releases/releases" target="_blank" rel="noopener">Gitee 全部版本</a>
@@ -400,6 +400,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
         <details><summary>汽水会员歌只能听 30 秒</summary><p>说明没有检测到签名器。检查 <code>%APPDATA%\sodam\config.json</code> 是否存在，或设置 <code>QISHUI_SIGNER_URL</code> / <code>QISHUI_SIGNER_TOKEN</code>；签名器不可用时 Novae 会回退试听。</p></details>
         <details><summary>波点为什么不能新建歌单</summary><p>波点暂不支持在 Novae 内新建歌单；请在波点 App 创建后同步，Novae 内可加入 / 移出已有歌单。</p></details>
         <details><summary>接口地址为什么显示成 xxx</summary><p>这是默认脱敏。点击输入框右侧的眼睛按钮即可显示真实地址并编辑；再次隐藏后恢复脱敏。</p></details>
+        <details><summary>网易云提示“登录已失效，请重新登录”</summary><p>1.4.2 起账号状态直连网易云官方接口，不再依赖本机 <code>localhost:3000</code> 云端 API。先点账号页的“检查状态”：只有官方明确返回 301 / 401 才需要重新登录；显示“暂时无法检查”通常是网络、代理或连接问题，不会清除已保存账号。</p></details>
         <details><summary>更新后账号需要重新登录吗</summary><p>正常覆盖 exe 不需要。只有删除 WebView2 用户目录、手动清空登录态，或平台侧 token 过期时才需要重新登录。</p></details>
         <details><summary>播放失败但平台网页能播</summary><p>可能是会员、地区、版权或平台风控限制。可尝试切换音质、切换云端 API，或在账号页重新登录；Novae 不绕过平台鉴权。</p></details>
       </div>
@@ -423,7 +424,7 @@ details p{margin:10px 0 0;max-width:720px;color:var(--muted);font-size:12px;line
     </div>
     <div class="footer-legal">
       <p>Novae 为独立实现，与各音乐平台及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。</p>
-      <p>本指南随 1.4.1 更新；若版本号或校验值与页面不一致，以应用内“关于”和 Release 资产为准。</p>
+      <p>本指南随 1.4.2 更新；若版本号或校验值与页面不一致，以应用内“关于”和 Release 资产为准。</p>
     </div>
     <div class="footer-bottom"><span>Copyright © 2026 Novae contributors.</span><span>Windows 10 / 11 · x64</span></div>
   </div>
