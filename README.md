@@ -94,7 +94,7 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - 迷你播放器修复深色主题下的白玻璃与错位：玻璃底色跟随主题，重排为封面 / 曲名歌手 / 走带三列、歌词独立一行、进度条贴底，变矮变窄自动进紧凑档。
 - 首次提供安装包 `Novae-1.4.3-Setup.exe`（免 UAC，安装到 `%LOCALAPPDATA%\Programs\Novae`，可勾选开始菜单与桌面快捷方式，卸载保留 `%APPDATA%\Novae` 用户数据）与便携包 `Novae-Portable.exe`。
 - 应用内更新分流：安装版升级下载安装包静默装回原目录，卸载项、快捷方式与版本记录一并刷新；便携版继续原地替换 exe，保留 `.bak` 回滚。便携资产改名 `Novae-Portable.exe`，不再把版本号写进文件名。
-- 主包与 internal 测试通过；正式包文件版本 `1.4.3.0`。
+- 内置更新默认走 Gitee 源（国内下载更快），检查失败可在「设置 → 关于」切回 GitHub。主包与 internal 测试通过；正式包文件版本 `1.4.3.0`。
 
 ### 1.4.2（2026-11-25）
 
@@ -156,16 +156,16 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 ## 下载与校验
 
 - 版本：**1.4.3**（Windows 文件版本 / 产品版本 `1.4.3.0`）
-- 安装包：`Novae-1.4.3-Setup.exe`　`18,988,399` 字节
-- 便携包：`Novae-Portable.exe`　`53,524,480` 字节
-- SHA-256（安装包）：`DE99A8063F30EC2753CCF526C6E5613A90F6A9826BC731209AB6C8196B75ADD1`
-- SHA-256（便携包）：`C3E394BDC1AB55735B4274479CF11E51E7B40291B413DF19512DBBFD5F25DA3A`
+- 安装包：`Novae-1.4.3-Setup.exe`　`18,986,488` 字节
+- 便携包：`Novae-Portable.exe`　`53,524,992` 字节
+- SHA-256（安装包）：`78A5ED3A5BD4DEE8EA6D89A9553EB854929F7CFDB29830C8C9432756AC9610EE`
+- SHA-256（便携包）：`92F46D6253D6B9E318B5773C044E76A67F60E56A8C3010155E0BE8E5A873BCEB`
 - GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.3>
 - Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.3>
 
 ```text
-DE99A8063F30EC2753CCF526C6E5613A90F6A9826BC731209AB6C8196B75ADD1  Novae-1.4.3-Setup.exe
-C3E394BDC1AB55735B4274479CF11E51E7B40291B413DF19512DBBFD5F25DA3A  Novae-Portable.exe
+78A5ED3A5BD4DEE8EA6D89A9553EB854929F7CFDB29830C8C9432756AC9610EE  Novae-1.4.3-Setup.exe
+92F46D6253D6B9E318B5773C044E76A67F60E56A8C3010155E0BE8E5A873BCEB  Novae-Portable.exe
 ```
 
 ## 安装
