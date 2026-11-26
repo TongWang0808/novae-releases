@@ -20,7 +20,8 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - **「我的歌单」独立滚动**：推荐、本地音乐等五个固定模块不再跟着歌单一起滚走；歌单列表成为侧栏唯一滚动区，滚动条不再在面板顶部、底部溢出，并加上下渐隐与滚动时浮现。
 - **歌词页过渡去黑屏**：移除过渡期的全屏深色遮罩与主界面隐藏；收起时先完成退全屏的窗口尺寸变化再撤卷帘，进出全屏不再黑一帧。
 - **迷你播放器重排**：深色主题下白玻璃、错位与按钮溢出修复；改为封面 / 曲名歌手 / 走带三列、歌词独立一行、进度条贴底的布局，窗口变矮变窄自动进紧凑档。
-- **安装包上线**：`Novae-1.4.3-Setup.exe` 免管理员权限安装到 `%LOCALAPPDATA%\Programs\Novae`，可勾选开始菜单与桌面快捷方式；便携包 `Novae-1.4.3-Portable.exe` 继续单文件使用。
+- **安装包上线**：`Novae-1.4.3-Setup.exe` 免管理员权限、可自选安装目录，可勾选开始菜单与桌面快捷方式；便携包 `Novae-Portable.exe` 继续单文件使用。
+- **应用内更新分流**：安装版在「设置 → 关于」升级时下载安装包静默装回原目录，卸载项、快捷方式与版本号一起刷新；便携版仍下载新 exe 原地替换并保留 `.bak` 回滚。
 
 1.4.2 的网易云登录态修正、账号与音源解耦、设置页整体缩放保持不变，可查看 [v1.4.2 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.2)。
 
@@ -91,7 +92,8 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - 歌单列表新增上下渐隐，滚动时滚动条浮现、停手自动隐藏。
 - 歌词页展开 / 收起去掉全屏深色遮罩与主界面隐藏，退全屏的窗口尺寸变化改在卷帘仍覆盖时完成，进出全屏不再黑屏闪一下。
 - 迷你播放器修复深色主题下的白玻璃与错位：玻璃底色跟随主题，重排为封面 / 曲名歌手 / 走带三列、歌词独立一行、进度条贴底，变矮变窄自动进紧凑档。
-- 首次提供安装包 `Novae-1.4.3-Setup.exe`（免 UAC，安装到 `%LOCALAPPDATA%\Programs\Novae`，可勾选开始菜单与桌面快捷方式，卸载保留 `%APPDATA%\Novae` 用户数据）与便携包 `Novae-1.4.3-Portable.exe`。
+- 首次提供安装包 `Novae-1.4.3-Setup.exe`（免 UAC，安装到 `%LOCALAPPDATA%\Programs\Novae`，可勾选开始菜单与桌面快捷方式，卸载保留 `%APPDATA%\Novae` 用户数据）与便携包 `Novae-Portable.exe`。
+- 应用内更新分流：安装版升级下载安装包静默装回原目录，卸载项、快捷方式与版本记录一并刷新；便携版继续原地替换 exe，保留 `.bak` 回滚。便携资产改名 `Novae-Portable.exe`，不再把版本号写进文件名。
 - 主包与 internal 测试通过；正式包文件版本 `1.4.3.0`。
 
 ### 1.4.2（2026-11-25）
@@ -154,16 +156,16 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 ## 下载与校验
 
 - 版本：**1.4.3**（Windows 文件版本 / 产品版本 `1.4.3.0`）
-- 安装包：`Novae-1.4.3-Setup.exe`　`18,989,416` 字节
-- 便携包：`Novae-1.4.3-Portable.exe`　`53,513,216` 字节
-- SHA-256（安装包）：`F465A120D3BB1F19F52D10C4F183A5DF699DF401E679CEA28FF369A5FC362299`
-- SHA-256（便携包）：`6C8B82ADC095E1570A2601288174E3E22D73995E37F9CDFE2C6408F2E7C87416`
+- 安装包：`Novae-1.4.3-Setup.exe`　`18,988,399` 字节
+- 便携包：`Novae-Portable.exe`　`53,524,480` 字节
+- SHA-256（安装包）：`DE99A8063F30EC2753CCF526C6E5613A90F6A9826BC731209AB6C8196B75ADD1`
+- SHA-256（便携包）：`C3E394BDC1AB55735B4274479CF11E51E7B40291B413DF19512DBBFD5F25DA3A`
 - GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.3>
 - Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.3>
 
 ```text
-F465A120D3BB1F19F52D10C4F183A5DF699DF401E679CEA28FF369A5FC362299  Novae-1.4.3-Setup.exe
-6C8B82ADC095E1570A2601288174E3E22D73995E37F9CDFE2C6408F2E7C87416  Novae-1.4.3-Portable.exe
+DE99A8063F30EC2753CCF526C6E5613A90F6A9826BC731209AB6C8196B75ADD1  Novae-1.4.3-Setup.exe
+C3E394BDC1AB55735B4274479CF11E51E7B40291B413DF19512DBBFD5F25DA3A  Novae-Portable.exe
 ```
 
 ## 安装
@@ -176,7 +178,7 @@ F465A120D3BB1F19F52D10C4F183A5DF699DF401E679CEA28FF369A5FC362299  Novae-1.4.3-Se
 
 **便携包**
 
-1. 下载 `Novae-1.4.3-Portable.exe`。
+1. 下载 `Novae-Portable.exe`。
 2. 直接运行，或替换旧版 `Novae.exe`，用户数据、登录态、歌单与下载记录保留在原有 WebView2 用户目录。
 
 **通用**
