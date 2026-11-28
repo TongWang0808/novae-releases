@@ -23,6 +23,7 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - **字体与玻璃**：弹窗改用设置页同一套字体，去掉 650 字重、额外字距与 `text-shadow`；隐私弹窗和退出确认统一为 96% 主题底 + `blur(28px)` 半透明玻璃。
 - **移除手动开关**：设置页隐私板块不再提供「启动时显示隐私提示」开关和「立即显示启动弹窗」按钮；启动提示恢复首次使用、版本更新必弹，其余按天提示。
 - **双包分发**：`Novae-1.4.5-Setup.exe` 免管理员权限、可自选安装目录与快捷方式；`Novae-1.4.5-Portable.exe` 单文件运行，继续保留原地替换与 `.bak` 回滚。
+- **更新重启修复**：免安装版点击「重启并安装」后强制走真正退出路径，不再被「关闭时最小化到托盘」拦截；更新助手不会空等 60 秒。
 
 1.4.4 的桌面布局、本地音乐、本地喜欢、云端解灰、平台账号持久化与歌词翻译修正全部保留，可查看 [v1.4.4 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.4)。
 
@@ -185,17 +186,17 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 ## 下载与校验
 
 - 版本：**1.4.5**（Windows 文件版本 / 产品版本 `1.4.5.0`）
-- 安装包：`Novae-1.4.5-Setup.exe`　`60,608,499` 字节
-- 便携包：`Novae-1.4.5-Portable.exe`　`60,003,328` 字节
-- SHA-256（安装包）：`0053FA6E7437F1688228170F7BDEBBDE6935CB1CFE0BD7018222A5D55AD9825A`
-- SHA-256（便携包）：`FCEB267196726AE704D165D1D40D1C23EB5287210F23D1E422A3A0103AD72824`
+- 安装包：`Novae-1.4.5-Setup.exe`　`60,609,545` 字节
+- 便携包：`Novae-1.4.5-Portable.exe`　`59,560,448` 字节
+- SHA-256（安装包）：`28936068DACF7C742FCE10F6421D94684E258DB7C46D4BD9124C71E02D1813FB`
+- SHA-256（便携包）：`1B9EEC925E3FAD493D30B0D6F1F8574B88E8E68918E1543755D7DC9BA754317C`
 - GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.5>
 - Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.5>
 - Gitee 资产镜像：<https://gitee.com/meiliwang0808/novae-releases-mirror/releases/tag/v1.4.5>（主仓附件配额已满，两个包在本公开镜像仓；旧版内置 Gitee 更新继续可用）
 
 ```text
-0053FA6E7437F1688228170F7BDEBBDE6935CB1CFE0BD7018222A5D55AD9825A  Novae-1.4.5-Setup.exe
-FCEB267196726AE704D165D1D40D1C23EB5287210F23D1E422A3A0103AD72824  Novae-1.4.5-Portable.exe
+28936068DACF7C742FCE10F6421D94684E258DB7C46D4BD9124C71E02D1813FB  Novae-1.4.5-Setup.exe
+1B9EEC925E3FAD493D30B0D6F1F8574B88E8E68918E1543755D7DC9BA754317C  Novae-1.4.5-Portable.exe
 ```
 
 ## 安装
