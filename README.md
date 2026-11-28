@@ -191,6 +191,7 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - SHA-256（便携包）：`FCEB267196726AE704D165D1D40D1C23EB5287210F23D1E422A3A0103AD72824`
 - GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.5>
 - Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.5>
+- Gitee 资产镜像：<https://gitee.com/meiliwang0808/novae-releases-mirror/releases/tag/v1.4.5>（主仓附件配额已满，两个包在本镜像仓）
 
 ```text
 0053FA6E7437F1688228170F7BDEBBDE6935CB1CFE0BD7018222A5D55AD9825A  Novae-1.4.5-Setup.exe
