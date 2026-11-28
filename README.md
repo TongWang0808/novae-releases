@@ -5,29 +5,26 @@
 Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端。华为音乐、QQ 音乐、网易云音乐、酷狗音乐、酷我音乐、汽水音乐与波点音乐可以同时登录、随时切换；也可以不登录任何平台，只接一个自建或公开的云端音源。
 
 [![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0b1220?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/latest)
-[![Version](https://img.shields.io/badge/version-1.4.4-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.4)
+[![Version](https://img.shields.io/badge/version-1.4.5-4f8cff?style=flat-square)](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.5)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
 [下载最新版](https://github.com/TongWang0808/novae-releases/releases/latest) · [Gitee 镜像](https://gitee.com/meiliwang0808/novae-releases/releases/latest) · [官网](https://tongwang0808.github.io/novae-releases/) · [更新清单](https://github.com/TongWang0808/novae-releases/blob/main/latest.json)
 
 > 本项目为独立实现，与华为、腾讯、网易、酷狗、酷我、抖音/汽水及其关联公司没有隶属、合作或代理关系。各平台名称、会员名称与相关权利归对应公司所有。Novae 不内置音源、账号或会员凭据，不破解 DRM。
 
-## 1.4.4 更新摘要
+## 1.4.5 更新摘要
 
-这是一个以 **桌面布局重做、本地音乐补全、本地喜欢合并、云端取流兜底与平台账号持久化** 为主的正式版；安装包与便携包继续双包分发。
+这是一个以 **七平台搜索口径统一、启动隐私弹窗与退出确认返工** 为主的维护版；安装包与便携包继续双包分发。
 
-- **桌面布局重做**：侧栏、顶栏、内容区与播放器统一基线；125% / 150% 缩放改为自适应横排，今日精选五张方形封面并排，本周热听独立成卡并内部滚动；账号过多时顶部账号区可横向滚动，不再挤压窗口按钮。
-- **推荐页字体修正**：专辑大标题、“音乐盲盒”、栏目标题与日期数字恢复 `Noto Serif SC` 衬线字体；只有下拉菜单跟随界面字体，不再被全局字体设置覆盖。
-- **本地音乐补全**：重新选择检索目录会清除旧的隐藏记录；新增“已移除 N 首 / 恢复”；扫描扩展名补充 `.opus/.m4b/.mp4`；打开检索文件夹改用独立窗口；本地播放可通过云端识别补全歌名、歌手、专辑、封面与歌词。
-- **本地喜欢**：本地歌曲可以点红心写入 `api-likes.json`，重启后仍能恢复；“我喜欢的音乐”支持平台喜欢 + 本地喜欢合并，并显示“含本地 N 首”；本地页批量栏与右键菜单去掉“加入歌单”。
-- **播放与音源**：30 秒试听自动救援完整音源；新增云端 `/song/url/match` 解灰；APE/DSD 自动降档；汽水音质档位修正为 `standard/hq`；平台账号优先、云端 API 全平台兜底。
-- **平台账号**：网易云改为内置官方接口直连，不再依赖自建云端 API；酷狗设备 GUID 与完整 Cookie 持久化；汽水签名器随包内置；波点补会员徽标解析。
-- **搜索**：只保留华为、网易云、QQ、酷狗、酷我、汽水、波点 7 个平台，默认华为，不再显示“API 曲库”。
-- **歌词翻译**：改为有道直连，修复翻译按钮点一次后失效的问题，支持中英文对照与缺失译文批量补齐。
-- **窗口与设置**：云端地址输入框始终可编辑；迷你播放器进入 / 退出顺序修复，启动提示未关闭时禁止进入迷你模式。
-- **双包分发**：`Novae-1.4.4-Setup.exe` 免管理员权限、可自选安装目录与快捷方式；`Novae-1.4.4-Portable.exe` 单文件运行。安装版升级下载安装包静默装回原目录，便携版原地替换 exe 并保留 `.bak` 回滚。
+- **搜索统一匿名**：华为、网易云、QQ、酷狗、酷我、汽水、波点七家搜索全部走匿名通道，登录账号不再改变搜索结果；游客、账号、API 默认音源三种状态下都保留完整七家平台。
+- **计数口径对齐**：平台标签按实际已加载、去重后的歌曲数显示；歌手页头部与列表使用同一份数量，不再出现头部和列表对不上。
+- **翻页容错**：首屏已返回的平台，后续翻页遇到酷狗 502、酷我 403 或超时时不再整家标成「不可用」；对 403 / 408 / 429 / 5xx / 超时做短退避重试。
+- **启动隐私弹窗**：固定 960×600，与设置页同画幅同步缩放；完整声明展开后正文独立滚动，头部与底栏固定。
+- **字体与玻璃**：弹窗改用设置页同一套字体，去掉 650 字重、额外字距与 `text-shadow`；隐私弹窗和退出确认统一为 96% 主题底 + `blur(28px)` 半透明玻璃。
+- **移除手动开关**：设置页隐私板块不再提供「启动时显示隐私提示」开关和「立即显示启动弹窗」按钮；启动提示恢复首次使用、版本更新必弹，其余按天提示。
+- **双包分发**：`Novae-1.4.5-Setup.exe` 免管理员权限、可自选安装目录与快捷方式；`Novae-1.4.5-Portable.exe` 单文件运行，继续保留原地替换与 `.bak` 回滚。
 
-1.4.3 的取流失败提示、侧栏独立滚动、歌词过渡与迷你播放器修正全部保留，可查看 [v1.4.3 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.3)。
+1.4.4 的桌面布局、本地音乐、本地喜欢、云端解灰、平台账号持久化与歌词翻译修正全部保留，可查看 [v1.4.4 发布说明](https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.4)。
 
 ## 界面
 
@@ -87,6 +84,18 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 - **下载与更新**：单曲 / 批量下载、音质选择、下载目录、文件缺失闭环；应用内读取双端更新清单。
 
 ## 版本日志
+
+### 1.4.5（2026-11-28）
+
+- 七平台搜索全部固定走匿名通道：华为、网易云、QQ、酷狗、酷我、汽水、波点在登录态与游客态下不再返回两套结果；搜索栏在游客、账号、API 默认音源三种状态下都保留完整七家。
+- 搜索计数改为按实际已加载、去重后的歌曲数计算，平台标签不再显示上游上报总数；歌手页头部歌曲数、专辑数同步改用实际列表数量，修复「196 首 / 128 首」对不上。
+- 首屏已返回的平台，后续翻页遇到酷狗末尾 502、酷我 403 或超时时不再把整家平台标成「不可用」；搜索请求对 403 / 408 / 429 / 5xx / 超时做短退避重试，401 / 404 不重试。
+- 启动隐私弹窗固定 960×600，与设置页同画幅并跟随同一个缩放变量；「查看完整隐私声明」展开后正文区独立滚动，头部与底栏固定。
+- 弹窗字体改用设置页同一套 `--ui-font-family`，去掉 650 中间字重、标题额外字距和 `text-shadow`，修复字体发虚、重影。
+- 启动隐私弹窗与退出确认统一为半透明玻璃：96% 主题底、`blur(28px) saturate(1.18)`、半透明描边与内高光；二维码 132px，窄屏 120px。
+- 移除设置页隐私板块的「启动时显示隐私提示」开关与「立即显示启动弹窗」按钮；启动提示恢复首次使用、版本更新必弹，其余按天提示，只有「今日不再弹出」跳过当天。
+- 版本元数据统一为 `1.4.5` / `1.4.5.0`；安装包与便携包双包分发，继续保留安装版静默升级与便携版原地替换 `.bak` 回滚。
+- `go test -count=1 ./...` 全部通过；`node --check frontend/dist/app.js` 通过；Wails `windows/amd64` 构建、UPX 校验、静默安装/卸载往返验证均通过。
 
 ### 1.4.4（2026-11-27）
 
@@ -175,30 +184,30 @@ Novae 是基于 **Wails v2（Go + WebView2）** 构建的桌面音乐客户端�
 
 ## 下载与校验
 
-- 版本：**1.4.4**（Windows 文件版本 / 产品版本 `1.4.4.0`）
-- 安装包：`Novae-1.4.4-Setup.exe`　`27,426,798` 字节
-- 便携包：`Novae-1.4.4-Portable.exe`　`62,904,320` 字节
-- SHA-256（安装包）：`AC30DA46A902FD06CA16DBD173DA1DB67A3915223322322B77B5BC1FFB019DA2`
-- SHA-256（便携包）：`885E82D41C45303FEF3C48D5260221E9EE70DC70DE2C79E40B4AD05095B3BBA0`
-- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.4>
-- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.4>
+- 版本：**1.4.5**（Windows 文件版本 / 产品版本 `1.4.5.0`）
+- 安装包：`Novae-1.4.5-Setup.exe`　`60,608,499` 字节
+- 便携包：`Novae-1.4.5-Portable.exe`　`60,003,328` 字节
+- SHA-256（安装包）：`0053FA6E7437F1688228170F7BDEBBDE6935CB1CFE0BD7018222A5D55AD9825A`
+- SHA-256（便携包）：`FCEB267196726AE704D165D1D40D1C23EB5287210F23D1E422A3A0103AD72824`
+- GitHub Releases：<https://github.com/TongWang0808/novae-releases/releases/tag/v1.4.5>
+- Gitee Releases：<https://gitee.com/meiliwang0808/novae-releases/releases/tag/v1.4.5>
 
 ```text
-AC30DA46A902FD06CA16DBD173DA1DB67A3915223322322B77B5BC1FFB019DA2  Novae-1.4.4-Setup.exe
-885E82D41C45303FEF3C48D5260221E9EE70DC70DE2C79E40B4AD05095B3BBA0  Novae-1.4.4-Portable.exe
+0053FA6E7437F1688228170F7BDEBBDE6935CB1CFE0BD7018222A5D55AD9825A  Novae-1.4.5-Setup.exe
+FCEB267196726AE704D165D1D40D1C23EB5287210F23D1E422A3A0103AD72824  Novae-1.4.5-Portable.exe
 ```
 
 ## 安装
 
 **安装包（推荐）**
 
-1. 下载并运行 `Novae-1.4.4-Setup.exe`，安装到当前用户目录 `%LOCALAPPDATA%\Programs\Novae`，不需要管理员权限。
+1. 下载并运行 `Novae-1.4.5-Setup.exe`，安装到当前用户目录 `%LOCALAPPDATA%\Programs\Novae`，不需要管理员权限。
 2. 安装过程可勾选「创建开始菜单快捷方式」（默认勾选）与「创建桌面快捷方式」（默认不勾选）；卸载时两者一并清理。
 3. 卸载只删除程序目录，`%APPDATA%\Novae` 下的账号、歌单、最近播放与下载记录保留。
 
 **便携包**
 
-1. 下载 `Novae-1.4.4-Portable.exe`。
+1. 下载 `Novae-1.4.5-Portable.exe`。
 2. 直接运行，或替换旧版 `Novae.exe`，用户数据、登录态、歌单与下载记录保留在原有 WebView2 用户目录。
 
 **通用**
